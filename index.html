@@ -745,7 +745,7 @@
     }
 
  /* ==========================================
-   Horizontal Service Slider (การ์ดทรงเดิม + เลื่อนซ้าย-ขวาได้)
+   Service Section: สไลด์บนคอมพิวเตอร์ / เรียงแนวตั้งบนมือถือ
    ========================================== */
 .service-slider-section {
   max-width: 1200px;
@@ -774,36 +774,7 @@
   align-items: center;
 }
 
-/* ==========================================
-   Infinite Draggable Service Slider
-   ========================================== */
-.service-slider-section {
-  max-width: 1200px;
-  margin: 24px auto 36px;
-  padding: 0 20px;
-  position: relative;
-}
-
-.service-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.service-slider-header h2 {
-  margin: 0;
-  color: #0f5132;
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-
-.service-slider-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
+/* บนคอมพิวเตอร์: แถบเลื่อนแนวนอน */
 .service-track {
   display: flex;
   gap: 18px;
@@ -829,11 +800,11 @@
   flex: 0 0 220px;
   text-decoration: none !important;
   color: inherit;
-  -webkit-user-drag: none; /* ป้องกันเบราว์เซอร์ลากตัวลิงก์แทนการสไลด์ */
+  -webkit-user-drag: none;
 }
 
 .service-track img {
-  pointer-events: none; /* ป้องกันรูปภาพถูกลากติดเมาส์ */
+  pointer-events: none;
   -webkit-user-drag: none;
 }
 
@@ -888,7 +859,7 @@
   line-height: 1.35;
 }
 
-/* ปุ่มลูกศร ซ้าย - ขวา */
+/* ปุ่มลูกศร ซ้าย - ขวา (แสดงเฉพาะหน้าจอคอมพิวเตอร์) */
 .service-nav-btn {
   position: absolute;
   top: 50%;
@@ -919,77 +890,56 @@
 .service-nav-btn.prev { left: -14px; }
 .service-nav-btn.next { right: -14px; }
 
-@media (max-width: 768px) {
-  .service-slider-section { padding: 0 12px; }
-  .service-track > a { flex: 0 0 190px; }
-  .service-track .image-card { height: 245px; }
-  .service-nav-btn { width: 36px; height: 36px; font-size: 1rem; }
-  .service-nav-btn.prev { left: -6px; }
-  .service-nav-btn.next { right: -6px; }
-}
-
-/* ปุ่มลูกศรกลม ซ้าย - ขวา เหมือน PEA Fund+ */
-.service-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #dce5df;
-  color: #0f5132;
-  font-size: 1.15rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.service-nav-btn:hover {
-  background: #0f5132;
-  color: #ffffff;
-  transform: translateY(-50%) scale(1.08);
-}
-
-.service-nav-btn.prev {
-  left: -14px;
-}
-
-.service-nav-btn.next {
-  right: -14px;
-}
-
-/* Responsive บนมือถือและแท็บเล็ต */
+/* ==========================================
+   หน้าจอโทรศัพท์ (<= 768px): เรียงแถวละ 1 กล่องลงมาเรื่อยๆ
+   ========================================== */
 @media (max-width: 768px) {
   .service-slider-section {
     padding: 0 12px;
   }
 
-  .service-track > a {
-    flex: 0 0 190px; /* บนมือถือให้เห็นใบถัดไปโผล่มานิดๆ เพื่อสื่อว่าเลื่อนซ้าย-ขวาได้ */
+  /* ซ่อนปุ่มลูกศรซ้าย-ขวาบนมือถือ */
+  .service-nav-btn {
+    display: none !important;
   }
 
+  /* เปลี่ยนแถบเลื่อนเป็น Grid 1 คอลัมน์เรียงลงมา */
+  .service-track {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    overflow-x: visible;
+    padding: 8px 0 12px;
+    cursor: default;
+  }
+
+  .service-track > a {
+    display: block;
+    width: 100%;
+    flex: none;
+  }
+
+  /* คงขนาดกล่องและตัวอักษรเดิมตามที่ต้องการ */
   .service-track .image-card {
+    width: 100%;
     height: 245px;
   }
 
+  .service-track .image-box {
+    padding: 18px 18px 8px;
+  }
+
+  .service-track .image-box img {
+    max-height: 145px;
+  }
+
   .service-track .image-caption {
+    height: auto;
+    min-height: 58px;
+    padding: 6px 14px 14px;
     font-size: 0.95rem;
+    line-height: 1.4;
   }
-
-  .service-nav-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-  }
-
-  .service-nav-btn.prev { left: -6px; }
-  .service-nav-btn.next { right: -6px; }
 }
     
   </style>
@@ -1315,41 +1265,72 @@
   const track = document.getElementById('serviceTrack');
   if (!track) return;
 
-  // 1. สร้างชุดการ์ดสำเนาต่อหัว-ท้าย (ฝั่งละ 2 ชุด เพื่อรองรับแรงปัดเร็วๆ บนมือถือ)
   const originalCards = Array.from(track.children);
-  for (let i = 0; i < 2; i++) {
-    originalCards.forEach(card => {
-      const cloneEnd = card.cloneNode(true);
-      cloneEnd.setAttribute('aria-hidden', 'true');
-      track.appendChild(cloneEnd);
-    });
-    originalCards.slice().reverse().forEach(card => {
-      const cloneStart = card.cloneNode(true);
-      cloneStart.setAttribute('aria-hidden', 'true');
-      track.insertBefore(cloneStart, track.firstChild);
-    });
-  }
+  const mobileQuery = window.matchMedia('(max-width: 768px)');
+  let isSliderActive = false;
+  let setWidth = 0;
+  let isJumping = false;
 
-  // คำนวณความกว้าง 1 ชุด (6 การ์ด)
   function getSetWidth() {
     const firstOriginal = originalCards[0];
     const gap = parseFloat(getComputedStyle(track).gap) || 18;
     return (firstOriginal.offsetWidth + gap) * originalCards.length;
   }
 
-  // ตั้งตำแหน่งเริ่มต้นไว้ที่ชุดตรงกลาง (ชุดที่ 3 จาก 5 ชุด)
-  let setWidth = getSetWidth();
-  track.scrollLeft = setWidth * 2;
+  function enableDesktopSlider() {
+    if (isSliderActive) return;
+    isSliderActive = true;
+
+    // สร้างสำเนาหัว-ท้ายเฉพาะตอนใช้งานบนหน้าจอคอมพิวเตอร์
+    for (let i = 0; i < 2; i++) {
+      originalCards.forEach(card => {
+        const cloneEnd = card.cloneNode(true);
+        cloneEnd.classList.add('service-clone');
+        cloneEnd.setAttribute('aria-hidden', 'true');
+        track.appendChild(cloneEnd);
+      });
+      originalCards.slice().reverse().forEach(card => {
+        const cloneStart = card.cloneNode(true);
+        cloneStart.classList.add('service-clone');
+        cloneStart.setAttribute('aria-hidden', 'true');
+        track.insertBefore(cloneStart, track.firstChild);
+      });
+    }
+
+    setWidth = getSetWidth();
+    track.scrollLeft = setWidth * 2;
+  }
+
+  function disableMobileSlider() {
+    if (!isSliderActive) return;
+    isSliderActive = false;
+
+    // ลบการ์ดสำเนาออกทั้งหมดบนมือถือ เพื่อไม่ให้แสดงซ้ำซ้อน
+    track.querySelectorAll('.service-clone').forEach(el => el.remove());
+    track.scrollLeft = 0;
+  }
+
+  function handleResponsiveMode(e) {
+    if (e.matches) {
+      disableMobileSlider();
+    } else {
+      enableDesktopSlider();
+    }
+  }
+
+  // ตรวจสอบโหมดทันทีที่โหลดหน้าเว็บ และคอยจับเวลาปรับขนาดหน้าจอ
+  handleResponsiveMode(mobileQuery);
+  mobileQuery.addEventListener('change', handleResponsiveMode);
 
   window.addEventListener('resize', () => {
+    if (!isSliderActive) return;
     setWidth = getSetWidth();
     track.scrollLeft = setWidth * 2;
   });
 
-  // 2. ปรับจุดรีเซ็ตวนลูปให้เผื่อพื้นที่กว้างขึ้น (ป้องกันปัดเร็วแล้วหลุดขอบ)
-  let isJumping = false;
+  // ระบบวนลูป (ทำงานเฉพาะบนคอมพิวเตอร์)
   function handleInfiniteLoop() {
-    if (isJumping) return;
+    if (!isSliderActive || isJumping) return;
 
     if (track.scrollLeft < setWidth * 1.2) {
       isJumping = true;
@@ -1363,14 +1344,14 @@
   }
   track.addEventListener('scroll', handleInfiniteLoop, { passive: true });
 
-  // 3. ระบบคลิกเมาส์ค้างแล้วลากบนคอมพิวเตอร์ (Mouse Drag)
+  // ระบบคลิกเมาส์ค้างแล้วลากบนคอมพิวเตอร์
   let isDown = false;
   let startX = 0;
   let scrollStart = 0;
   let hasDragged = false;
 
   track.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return;
+    if (!isSliderActive || e.button !== 0) return;
     isDown = true;
     hasDragged = false;
     track.classList.add('is-dragging');
@@ -1379,7 +1360,7 @@
   });
 
   window.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
+    if (!isDown || !isSliderActive) return;
     const x = e.pageX - track.offsetLeft;
     const walk = (x - startX) * 1.3;
     if (Math.abs(walk) > 6) {
@@ -1403,8 +1384,9 @@
     }
   }, true);
 
-  // 4. ปุ่มกดลูกศร ซ้าย - ขวา
+  // ปุ่มกดลูกศร ซ้าย - ขวา บนคอมพิวเตอร์
   window.scrollServiceTrack = function (direction) {
+    if (!isSliderActive) return;
     const firstOriginal = originalCards[0];
     const gap = parseFloat(getComputedStyle(track).gap) || 18;
     const step = (firstOriginal.offsetWidth + gap) * 2;
