@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>การลงเวลา กรณีลาครึ่งวัน - Si_HR ID card</title>
+
+  <!-- ไอคอนเว็บ (Favicon) -->
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Base Styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: #f4f6f9;
+      color: #26372e;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+    }
+    a { text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* Navbar (ความสูงกระชับเข้าชุดกับหน้าหลัก) */
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 56px;
+    }
+    .navbar-container {
+      height: 56px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand-logo { display: flex; align-items: center; flex-shrink: 0; }
+    .brand-logo img {
+      display: block;
+      width: auto;
+      height: 48px;
+      max-width: min(48vw, 220px);
+      object-fit: contain;
+    }
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-item .nav-link {
+      color: #333;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .nav-item .nav-link:hover { color: #094824; }
+    .menu-toggle { display: none; }
+    .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #333;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 20px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+      .menu-toggle:checked ~ .nav-menu { display: flex; }
+      .menu-toggle:checked ~ .hamburger span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+      .menu-toggle:checked ~ .hamburger span:nth-child(2) { opacity: 0; }
+      .menu-toggle:checked ~ .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+    }
+
+    /* Half-Day Leave Guide Content */
+    .halfday-page {
+      --green: #0f5132;
+      --green-bright: #198754;
+      --green-pale: #eaf7ef;
+      --blue: #2867a8;
+      --blue-pale: #edf5ff;
+      --gold-pale: #fff8e8;
+      --ink: #26372e;
+      --muted: #647067;
+
+      width: min(100% - 32px, 920px);
+      margin: 32px auto;
+      overflow: hidden;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #e3ebe5;
+      border-radius: 20px;
+      box-shadow: 0 8px 26px rgba(15, 81, 50, 0.08);
+    }
+
+    .halfday-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 32px 36px;
+      color: #fff;
+      background: linear-gradient(120deg, #094824, #0f5132 55%, #198754);
+    }
+
+    .halfday-hero::after {
+      position: absolute;
+      top: -90px;
+      right: -45px;
+      width: 260px;
+      height: 260px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 24px rgba(255, 255, 255, .06),
+                  0 0 0 50px rgba(255, 255, 255, .04);
+    }
+
+    .halfday-hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .halfday-hero-icon {
+      display: grid;
+      flex: 0 0 60px;
+      width: 60px;
+      height: 60px;
+      place-items: center;
+      color: #fff;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .35);
+      border-radius: 16px;
+    }
+
+    .halfday-hero-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .halfday-eyebrow {
+      margin: 0 0 5px;
+      color: #c9efda;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    .halfday-hero h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 3.5vw, 1.95rem);
+      line-height: 1.35;
+    }
+
+    .halfday-hero p:last-child {
+      margin: 6px 0 0;
+      color: #e2f5e9;
+      line-height: 1.55;
+    }
+
+    .halfday-content {
+      padding: 28px 36px 34px;
+    }
+
+    .halfday-select-card {
+      padding: 22px;
+      background: linear-gradient(135deg, #f4faf6, #f2f8ff);
+      border: 1px solid #e0ebe4;
+      border-radius: 16px;
+    }
+
+    .halfday-select-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .halfday-select-hint {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .halfday-select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 16px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #cbdcd1;
+      border-radius: 11px;
+      font: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .halfday-select:focus {
+      outline: 4px solid rgba(25, 135, 84, .15);
+      border-color: var(--green-bright);
+    }
+
+    .halfday-empty {
+      margin-top: 18px;
+      padding: 18px;
+      color: var(--muted);
+      background: #fafcfb;
+      border: 1px dashed #d6e2da;
+      border-radius: 13px;
+      text-align: center;
+    }
+
+    .halfday-result {
+      display: none;
+      margin-top: 22px;
+      animation: halfday-appear .28s ease-out;
+    }
+
+    .halfday-result.is-visible {
+      display: block;
+    }
+
+    @keyframes halfday-appear {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .halfday-result-heading {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 14px;
+    }
+
+    .halfday-result-heading h2 {
+      margin: 0;
+      color: var(--green);
+      font-size: 1.3rem;
+    }
+
+    .halfday-code-badge {
+      padding: 5px 14px;
+      color: #fff;
+      background: var(--green);
+      border-radius: 999px;
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .halfday-work-times,
+    .halfday-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .halfday-time-card {
+      position: relative;
+      overflow: hidden;
+      padding: 18px 20px;
+      background: #f8faf9;
+      border: 1px solid #e2eae5;
+      border-radius: 14px;
+    }
+
+    .halfday-time-card::before {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: var(--green-bright);
+      content: "";
+    }
+
+    .halfday-time-card.is-end::before {
+      background: #4c82c3;
+    }
+
+    .halfday-time-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .halfday-time-value {
+      color: var(--ink);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .halfday-options-title {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      margin: 24px 0 13px;
+      color: var(--ink);
+      font-size: 1.15rem;
+    }
+
+    .halfday-options-title::before {
+      width: 9px;
+      height: 9px;
+      background: #d99b21;
+      border-radius: 50%;
+      content: "";
+    }
+
+    .halfday-option {
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .halfday-option--first {
+      color: #175a38;
+      background: var(--green-pale);
+      border: 1px solid #cce7d5;
+    }
+
+    .halfday-option--second {
+      color: #285987;
+      background: var(--blue-pale);
+      border: 1px solid #d1e2f5;
+    }
+
+    .halfday-option-label {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .halfday-option-dot {
+      display: inline-grid;
+      width: 27px;
+      height: 27px;
+      place-items: center;
+      color: #fff;
+      background: var(--green-bright);
+      border-radius: 50%;
+      font-size: .82rem;
+    }
+
+    .halfday-option--second .halfday-option-dot {
+      background: var(--blue);
+    }
+
+    .halfday-instruction {
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .halfday-instruction strong {
+      display: inline-block;
+      margin: 0 3px;
+      font-size: 1.55rem;
+      line-height: 1.2;
+    }
+
+    .halfday-option--first .halfday-instruction strong { color: var(--green); }
+    .halfday-option--second .halfday-instruction strong { color: var(--blue); }
+
+    .halfday-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 18px 0 0;
+      padding: 13px 15px;
+      color: #66521f;
+      background: var(--gold-pale);
+      border-left: 4px solid #d99b21;
+      border-radius: 8px;
+      font-size: .93rem;
+      line-height: 1.6;
+    }
+
+    .halfday-note-mark {
+      display: grid;
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: #fff;
+      background: #d99b21;
+      border-radius: 50%;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #094824;
+      color: #a3d9ba;
+      padding: 40px 0 20px 0;
+      margin-top: auto;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+    }
+    .footer-about h3, .footer-links h4 {
+      color: #ffffff;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    .footer-about p {
+      line-height: 1.4;
+      font-size: 14px;
+      color: #a3d9ba;
+    }
+    .footer-about p:last-child { margin-bottom: 0; }
+    .footer-links ul { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a {
+      color: #ffffff;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s ease;
+    }
+    .footer-links a:hover { transform: translateX(8px); }
+    .footer-links a::before {
+      content: "— ";
+      opacity: 0;
+      margin-right: -12px;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .footer-links a:hover::before { opacity: 1; margin-right: 6px; }
+    .qr-image-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+      display: inline-block;
+    }
+    .qr-image-box img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      display: block;
+      border-radius: 6px;
+    }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 30px auto 0 auto;
+      padding: 20px 20px 0 20px;
+      border-top: 1px solid #a3d9ba;
+      text-align: center;
+      color: #8ebdaa;
+      font-size: 16px;
+    }
+
+    /* Responsive Scaling (ปรับสเกลให้เข้ากับหน้าอื่นๆ บนแท็บเล็ตและมือถือ) */
+    @media (max-width: 992px) {
+      html, body { font-size: 20px; line-height: 1.65; }
+      .navbar, .navbar-container { height: 64px; min-height: 64px; }
+      .brand-logo img { height: 50px; max-width: 55vw; }
+      .nav-item .nav-link { font-size: 1.15rem; }
+
+      .footer { padding: 42px 0 26px; font-size: 1.05rem; }
+      .footer-container { grid-template-columns: 1fr; gap: 30px; }
+      .footer-about h3, .footer-links h4 { font-size: 1.3rem; }
+      .footer-about p, .footer-links a { font-size: 1.05rem; }
+      .qr-image-box img { width: 180px; height: 180px; }
+    }
+
+    @media (max-width: 600px) {
+      .halfday-page {
+        width: calc(100% - 20px);
+        margin: 16px auto;
+        border-radius: 16px;
+      }
+      .halfday-hero { padding: 24px 18px; }
+      .halfday-hero-content { gap: 13px; }
+      .halfday-hero-icon {
+        flex-basis: 48px;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+      }
+      .halfday-hero-icon svg { width: 26px; height: 26px; }
+      .halfday-content { padding: 20px 16px 24px; }
+      .halfday-select-card { padding: 16px; }
+      .halfday-work-times, .halfday-options { grid-template-columns: 1fr; gap: 10px; }
+      .halfday-time-card, .halfday-option { padding: 16px; }
+      .halfday-time-value { font-size: 1.3rem; }
+      .halfday-result-heading h2 { font-size: 1.2rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .halfday-result { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" aria-label="เมนูหลัก">
+    <div class="navbar-container">
+      <a href="index.html" class="brand-logo" aria-label="Si_HR ID card หน้าแรก">
+        <img src="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw" alt="Si_HR ID card">
+      </a>
+
+      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="เปิดหรือปิดเมนู">
+      <label for="menu-toggle" class="hamburger" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </label>
+
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">หน้าแรก</a></li>
+        <li class="nav-item"><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="halfday-page">
+    <header class="halfday-hero">
+      <div class="halfday-hero-content">
+        <div class="halfday-hero-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="13" r="8.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 8v5l3.2 2M9 2h6M12 2v2"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="halfday-eyebrow">TIME ATTENDANCE GUIDE</p>
+          <h1>การลงเวลา กรณีลาครึ่งวัน</h1>
+          <p>เลือกกะการทำงาน เพื่อดูช่วงเวลาทาบบัตร</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="halfday-content">
+      <div class="halfday-select-card">
+        <label class="halfday-select-label" for="shiftSelect">
+          เลือกกะการทำงาน (DWS)
+        </label>
+        <p class="halfday-select-hint">
+          เลือกรหัสกะพร้อมเวลาเริ่มงานและเลิกงานให้ตรงกับตารางของคุณ
+        </p>
+
+        <select class="halfday-select" id="shiftSelect">
+          <option value="">เลือกกะการทำงาน</option>
+          <option value="NM01">NM01 — 05:30:00–13:30:00</option>
+          <option value="NM02">NM02 — 06:00:00–14:00:00</option>
+          <option value="NM03">NM03 — 06:30:00–14:30:00</option>
+          <option value="NM04">NM04 — 07:00:00–15:00:00</option>
+          <option value="NM05">NM05 — 07:30:00–15:30:00</option>
+          <option value="NM06">NM06 — 08:00:00–16:00:00</option>
+          <option value="NM07">NM07 — 08:30:00–16:30:00</option>
+          <option value="NM08">NM08 — 09:00:00–17:00:00</option>
+          <option value="NM09">NM09 — 10:00:00–18:00:00</option>
+          <option value="NM10">NM10 — 10:30:00–18:30:00</option>
+          <option value="NM11">NM11 — 11:00:00–19:00:00</option>
+          <option value="NM12">NM12 — 12:00:00–20:00:00</option>
+          <option value="NM13">NM13 — 15:00:00–23:00:00</option>
+          <option value="NM14">NM14 — 19:00:00–03:00:00 (ข้ามวัน)</option>
+          <option value="NM15">NM15 — 23:00:00–07:00:00 (ข้ามวัน)</option>
+        </select>
+      </div>
+
+      <div class="halfday-empty" id="emptyMessage">
+        เลือกกะด้านบน แล้วระบบจะแสดงเวลาเริ่มงานและช่วงเวลาทาบบัตร
+      </div>
+
+      <section class="halfday-result" id="shiftResult" aria-live="polite">
+        <div class="halfday-result-heading">
+          <h2>เวลาปฏิบัติงาน</h2>
+          <span class="halfday-code-badge" id="shiftCode"></span>
+        </div>
+
+        <div class="halfday-work-times">
+          <div class="halfday-time-card">
+            <span class="halfday-time-label">เวลาเริ่มงาน</span>
+            <strong class="halfday-time-value" id="workStart"></strong>
+          </div>
+          <div class="halfday-time-card is-end">
+            <span class="halfday-time-label">เวลาเลิกงาน</span>
+            <strong class="halfday-time-value" id="workEnd"></strong>
+          </div>
+        </div>
+
+        <h3 class="halfday-options-title">ช่วงเวลาทาบบัตรกรณีลาครึ่งวัน</h3>
+
+        <div class="halfday-options">
+          <div class="halfday-option halfday-option--first">
+            <div class="halfday-option-label">
+              <span class="halfday-option-dot">1</span>
+              ลาครึ่งวันแรก
+            </div>
+            <div class="halfday-instruction">
+              ต้องทาบบัตรก่อน <strong id="firstHalf"></strong>
+            </div>
+          </div>
+
+          <div class="halfday-option halfday-option--second">
+            <div class="halfday-option-label">
+              <span class="halfday-option-dot">2</span>
+              ลาครึ่งวันหลัง
+            </div>
+            <div class="halfday-instruction">
+              ทาบบัตรตั้งแต่ <strong id="secondHalf"></strong> เป็นต้นไป
+            </div>
+          </div>
+        </div>
+
+        <p class="halfday-note">
+          <span class="halfday-note-mark">!</span>
+          <span>กรุณาตรวจสอบกะการทำงานให้ถูกต้อง และอ้างอิงหลักเกณฑ์การลาของหน่วยงานประกอบ</span>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-about" id="contact">
+        <h3>ติดต่อห้องทำบัตร</h3>
+        <p>ตึกท่านผู้หญิงวิจิตรา</p>
+        <p>โทรศัพท์: 0-2419-7180</p>
+        <p>วันที่ให้บริการ: จันทร์ | พุธ | ศุกร์</p>
+        <p>เวลาทำการ: 08:30–16:30 น. (พักเที่ยง)</p>
+        <p>Email: papinwit.sam@mahidol.ac.th</p>
+      </div>
+
+      <nav class="footer-links" aria-label="เมนูด่วน">
+        <h4>เมนูด่วน</h4>
+        <ul>
+          <li><a href="damaged-card.html">บัตรพนักงานชำรุด</a></li>
+          <li><a href="lost-card.html">บัตรพนักงานหาย</a></li>
+          <li><a href="new-employee-card.html">ทำบัตรพนักงานบรรจุใหม่</a></li>
+          <li><a href="time-recording-guide.html">ขั้นตอนการบันทึกเวลา</a></li>
+          <li><a href="half-day-leave.html">การลงเวลา กรณีลาครึ่งวัน</a></li>
+          <li><a href="internet-guide.html">สมัครใช้งาน Internet</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-links">
+        <h4>LINE: Si_HR ID Card</h4>
+        <div class="qr-image-box">
+          <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code สำหรับ LINE Si_HR ID Card" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Website: Si_HR ID card<br>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล มหาวิทยาลัยมหิดล</p>
+    </div>
+  </footer>
+
+  <script>
+    const shiftData = {
+      NM01: { start: '05:30:00', end: '13:30:00', first: '10:00', second: '09:00' },
+      NM02: { start: '06:00:00', end: '14:00:00', first: '10:30', second: '09:30' },
+      NM03: { start: '06:30:00', end: '14:30:00', first: '11:00', second: '10:00' },
+      NM04: { start: '07:00:00', end: '15:00:00', first: '11:30', second: '10:30' },
+      NM05: { start: '07:30:00', end: '15:30:00', first: '12:00', second: '11:00' },
+      NM06: { start: '08:00:00', end: '16:00:00', first: '12:30', second: '11:30' },
+      NM07: { start: '08:30:00', end: '16:30:00', first: '13:00', second: '12:00' },
+      NM08: { start: '09:00:00', end: '17:00:00', first: '13:30', second: '12:30' },
+      NM09: { start: '10:00:00', end: '18:00:00', first: '14:30', second: '13:30' },
+      NM10: { start: '10:30:00', end: '18:30:00', first: '15:00', second: '14:00' },
+      NM11: { start: '11:00:00', end: '19:00:00', first: '15:30', second: '14:30' },
+      NM12: { start: '12:00:00', end: '20:00:00', first: '16:30', second: '15:30' },
+      NM13: { start: '15:00:00', end: '23:00:00', first: '19:30', second: '18:30' },
+      NM14: { start: '19:00:00', end: '03:00:00', first: '23:30', second: '22:30' },
+      NM15: { start: '23:00:00', end: '07:00:00', first: '03:30', second: '02:30' }
+    };
+
+    const shiftSelect = document.getElementById('shiftSelect');
+    const shiftResult = document.getElementById('shiftResult');
+    const emptyMessage = document.getElementById('emptyMessage');
+
+    shiftSelect.addEventListener('change', function () {
+      const shift = shiftData[this.value];
+
+      if (!shift) {
+        shiftResult.classList.remove('is-visible');
+        emptyMessage.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('shiftCode').textContent = this.value;
+      document.getElementById('workStart').textContent = shift.start;
+      document.getElementById('workEnd').textContent = shift.end;
+      document.getElementById('firstHalf').textContent = shift.first;
+      document.getElementById('secondHalf').textContent = shift.second;
+
+      emptyMessage.style.display = 'none';
+      shiftResult.classList.add('is-visible');
+    });
+  </script>
+</body>
+</html>
