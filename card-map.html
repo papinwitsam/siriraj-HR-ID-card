@@ -143,26 +143,31 @@
 
     <!-- Header -->
     <header class="sticky top-0 w-full bg-white border-b border-slate-200 px-3 py-2 md:px-6 flex-none flex items-center justify-between shadow-sm z-30 min-h-[52px]">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 md:w-8 md:h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-base md:text-sm shadow-sm flex-none">
-                <i class="fa-solid fa-hospital-user"></i>
-            </div>
-            <div class="min-w-0">
-                <h1 class="font-bold text-sm lg:text-base text-slate-800 leading-tight truncate">แผนที่ตำแหน่งเครื่องทาบบัตรพนักงาน</h1>
-                <p class="text-[10px] md:text-xs text-slate-500 leading-none hidden sm:block">โรงพยาบาลศิริราช</p>
-            </div>
+    <!-- ฝั่งซ้าย: โลโก้และชื่อเว็บ -->
+    <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 md:w-8 md:h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-base md:text-sm shadow-sm flex-none">
+            <i class="fa-solid fa-hospital-user"></i>
         </div>
+        <div class="min-w-0">
+            <h1 class="font-bold text-sm lg:text-base text-slate-800 leading-tight truncate">แผนที่ตำแหน่งเครื่องทาบบัตรพนักงาน</h1>
+            <p class="text-[10px] md:text-xs text-slate-500 leading-none hidden sm:block">โรงพยาบาลศิริราช</p>
+        </div>
+    </div>
+
+    <!-- ฝั่งขวา: ครอบปุ่มทั้ง 2 ไว้ใน div เดียวกัน -->
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-none ml-2">
         <a href="index.html" rel="noopener noreferrer"
-           class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap flex-none ml-2">
+           class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap">
+            <i class="fa-solid fa-house text-[10px]"></i>
             <span>หน้าแรก</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
         </a>
         <a href="https://script.google.com/a/macros/mahidol.ac.th/s/AKfycbxuYeQPDYXIbxB6ROxBqL5co1UIuEZ9-amtrfliqVVP99YvoS6bTbf8n7tzc4YjAnLv/exec" target="_blank" rel="noopener noreferrer"
-           class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap flex-none ml-2">
+           class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap">
             <span>สถานะเครื่อง</span>
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
         </a>
-    </header>
+    </div>
+</header>
 
     <!-- กรอบเนื้อหา: บน PC จะเว้นระยะซ้าย-ขวา -->
     <div class="w-full max-w-5xl mx-auto md:shadow-[0_0_18px_rgba(15,23,42,0.07)]">
