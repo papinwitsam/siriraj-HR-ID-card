@@ -1,943 +1,1014 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>แผนที่ตำแหน่งเครื่องทาบบัตร | โรงพยาบาลศิริราช</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Kanit', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Si_HR ID card - ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</title>
 
-        /* ---------- แผนที่ ---------- */
-        .map-viewport { cursor: grab; user-select: none; touch-action: none; overflow: hidden; }
-        .map-viewport:active { cursor: grabbing; }
-        #mapImage { image-rendering: auto; }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        /* จุดทาบบัตร: ขยาย/ย่อตามการซูมของแผนที่ */
-        .hotspot-dot {
-            position: absolute;
-            width: 20px; height: 20px;
-            background-color: #15803d;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-            transform: translate(-50%, -50%) scale(var(--inv, 1));
-            transition: background-color .25s, opacity .25s, box-shadow .25s;
-            z-index: 20;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 9px; font-weight: 700; line-height: 1;
-            touch-action: manipulation;
-        }
-        .hotspot-dot:hover, .hotspot-dot.active {
-            transform: translate(-50%, -50%) scale(calc(var(--inv, 1) * 1.35));
-            z-index: 30;
-        }
-        .hotspot-dot.active { box-shadow: 0 0 0 4px rgba(22,163,74,.40), 0 2px 8px rgba(0,0,0,.4); }
-        .hotspot-dot.status-warning { background-color: #ef4444; }
-        .hotspot-dot.status-warning.active { box-shadow: 0 0 0 4px rgba(239,68,68,.40), 0 2px 8px rgba(0,0,0,.4); }
-        .hotspot-dot.dimmed { opacity: .25; }
+  <!-- CSS หลัก (รวมจาก Style.html) -->
+  <style>
+    /* Base styles */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
-        .hotspot-label {
-            position: absolute; bottom: 100%; left: 50%;
-            transform: translateX(-50%) translateY(-6px);
-            background: rgba(15, 23, 42, 0.92); color: #fff;
-            padding: 3px 8px; border-radius: 6px;
-            font-size: 11px; font-weight: 500; white-space: nowrap;
-            pointer-events: none; opacity: 0;
-            transition: opacity .2s, transform .2s;
-        }
-        .hotspot-dot:hover .hotspot-label, .hotspot-dot.active .hotspot-label {
-            opacity: 1; transform: translateX(-50%) translateY(-9px);
-        }
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
 
-        /* จุดตำแหน่งของฉัน */
-        .user-dot {
-            position: absolute; width: 16px; height: 16px;
-            background: #2563eb; border: 3px solid #fff; border-radius: 50%;
-            transform: translate(-50%, -50%) scale(var(--inv, 1));
-            box-shadow: 0 2px 8px rgba(37,99,235,.6);
-            z-index: 40; pointer-events: none;
-        }
-        .user-dot::before {
-            content: ''; position: absolute; inset: -3px; border-radius: 50%;
-            background: rgba(37,99,235,.45);
-            animation: user-pulse 1.8s ease-out infinite;
-        }
-        .user-dot span {
-            position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            margin-top: 4px; background: #2563eb; color: #fff;
-            font-size: 10px; padding: 1px 6px; border-radius: 6px; white-space: nowrap;
-        }
-        @keyframes user-pulse { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(3); opacity: 0; } }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: #f4f6f9;
+      color: #26372e;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+    }
 
-        /* ---------- การ์ดรายการ ---------- */
-        .tap-card { transition: box-shadow .2s, border-color .2s, background-color .2s; }
-        .tap-card.selected { border-color: #16a34a; background-color: #f0fdf4; box-shadow: 0 0 0 2px rgba(22,163,74,.25); }
-        .chip-active { background-color: #15803d !important; color: #fff !important; border-color: #15803d !important; }
+    a {
+      text-decoration: none;
+    }
 
-        .modal-backdrop { background-color: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); }
+    /* Styling ตัว Navbar */
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 64px;
+    }
 
-        #toast { transition: opacity .3s, transform .3s; }
+    .navbar-container {
+      height: 64px;
+      min-height: 0;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        /* ===== พื้นหลังของหน้าเว็บ =====
-           สีพื้นอ่อนๆ + ลายเหลี่ยมโปร่งแสง (ดูส่วน id="bgFx" ใต้แท็ก <body>)
-           อยากเข้ม/จางลง: ปรับ stop-opacity ใน <linearGradient> ของ bgFx
-           อยากใช้รูปแทน: เปิดบรรทัด background-image ด้านล่าง แล้วลบ div id="bgFx" ออก */
-        body {
-            background-color: #f3f6f7;
-            /* background-image: url('ใส่ลิงก์รูปพื้นหลังตรงนี้'); */
-            /* background-size: cover; background-position: center; background-attachment: fixed; */
-        }
-    </style>
+    /* โลโก้ Navbar */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .brand-logo img {
+      display: block;
+      width: auto;
+      height: 60px;
+      max-width: min(48vw, 220px);
+      object-fit: contain;
+    }
+
+    /* เมนูลิงก์ (Desktop) */
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .nav-item .nav-link {
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item .nav-link:hover {
+      color: #094824;
+    }
+
+    /* ซ่อน Checkbox สำหรับเปิด/ปิดเมนูมือถือ */
+    .menu-toggle {
+      display: none;
+    }
+
+    /* ปุ่ม Hamburger สำหรับมือถือ */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #333;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 20px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .menu-toggle:checked ~ .nav-menu {
+        display: flex;
+      }
+
+      .menu-toggle:checked ~ .hamburger span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+      }
+      .menu-toggle:checked ~ .hamburger span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-toggle:checked ~ .hamburger span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+    }
+
+    /* Main Container */
+    .main-container {
+      width: 100%;
+      flex: 1 0 auto;
+    }
+
+    .grid-section-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    /* Page Header Banner */
+    .page-title-banner {
+      background-color: #0f5132;
+      color: #ffffff;
+      text-align: left;
+      padding: 8px 20px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      font-size: 18px;
+    }
+
+    /* Image Grid */
+    .image-grid-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .image-card {
+      background-color: #ffffff;
+      border: 1px solid #e5ebe7;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      cursor: pointer;
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .image-card:hover {
+      transform: translateY(-5px);
+      border-color: #0f5132;
+      box-shadow: 0 10px 24px rgba(15, 81, 50, 0.12);
+    }
+
+    .image-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 20px 10px 20px;
+      overflow: hidden;
+    }
+
+    .image-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .image-card:hover .image-box img {
+      transform: scale(1.08);
+    }
+
+    .image-caption {
+      height: 60px;
+      padding: 0 15px 15px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #333333;
+      line-height: 1.3;
+    }
+
+    .time-menu-icon {
+      display: block;
+      width: 140px;
+      height: 140px;
+    }
+
+    /* กล่องขั้นตอนสำหรับพนักงานบรรจุใหม่ */
+    .new-staff-guide {
+      max-width: 1160px;
+      margin: 28px auto;
+      padding: 26px 28px;
+      background: #ffffff;
+      border: 1px solid #e5ebe7;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .new-staff-heading {
+      margin-bottom: 22px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .new-staff-heading h2 {
+      margin: 0 0 6px;
+      color: #24352c;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .new-staff-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .new-staff-link-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 90px;
+      padding: 18px;
+      color: inherit;
+      text-decoration: none !important;
+      background: #f7faf8;
+      border: 1px solid #e7eee9;
+      border-radius: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .new-staff-link-card:hover {
+      transform: translateY(-3px);
+      border-color: #0f5132;
+      box-shadow: 0 8px 18px rgba(15, 81, 50, 0.1);
+    }
+
+    .new-staff-link-card .step-number {
+      display: flex;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #0f5132;
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .new-staff-link-text {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .new-staff-link-text strong {
+      color: #26372e;
+      font-size: 1rem;
+    }
+
+    .new-staff-link-text small {
+      color: #647067;
+      font-size: 0.9rem;
+    }
+
+    .link-arrow {
+      color: #0f5132;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    /* Map Container */
+    .map-container {
+      width: 100%;
+      height: 500px;
+    }
+
+    .map-container iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+    }
+
+    /* Poster Banner Slider */
+    .poster-slider-container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .poster-slider-wrapper {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background-color: #0f172a;
+    }
+
+    .poster-slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .poster-slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .poster-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      z-index: 2;
+    }
+
+    .poster-bg-blur {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover !important;
+      filter: blur(20px) opacity(0.35);
+      transform: scale(1.1);
+      z-index: 1;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.85);
+      color: #0f172a;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .slider-btn:hover {
+      background: #ffffff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .slider-btn.prev { left: 16px; }
+    .slider-btn.next { right: 16px; }
+
+    .slider-dots {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      width: 28px;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+
+    /* Footer Styles */
+    .footer {
+      background-color: #094824;
+      color: #a3d9ba;
+      padding: 40px 0 20px 0;
+      margin-top: auto;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+    }
+
+    .footer-about h3,
+    .footer-links h4 {
+      color: #ffffff;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .footer-about p {
+      line-height: 1.4;
+      font-size: 14px;
+      color: #a3d9ba;
+    }
+
+    .footer-about p:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer-links ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 10px;
+    }
+
+    .footer-links a {
+      color: #ffffff;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      transform: translateX(8px);
+    }
+
+    .footer-links a::before {
+      content: "— ";
+      opacity: 0;
+      margin-right: -12px;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .footer-links a:hover::before {
+      opacity: 1;
+      margin-right: 6px;
+    }
+
+    .qr-image-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+      display: inline-block;
+    }
+
+    .qr-image-box img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 30px auto 0 auto;
+      padding: 20px 20px 0 20px;
+      border-top: 1px solid #a3d9ba;
+      text-align: center;
+      color: #8ebdaa;
+      font-size: 16px;
+    }
+
+    .visitor-counter-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    .visitor-number {
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 992px) {
+      html {
+        font-size: 20px;
+      }
+
+      body {
+        font-size: 20px;
+        line-height: 1.65;
+      }
+
+      .navbar,
+      .navbar-container {
+        height: 80px;
+        min-height: 80px;
+      }
+
+      .navbar-container {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .brand-logo img {
+        height: 58px;
+        max-width: 55vw;
+      }
+
+      .page-title-banner {
+        padding: 15px 18px;
+        font-size: 1.35rem;
+        line-height: 1.4;
+      }
+
+      .image-grid-container {
+        margin: 28px auto;
+      }
+
+      .image-grid,
+      .new-staff-links {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+
+      .image-card {
+        height: 420px;
+      }
+
+      .image-box {
+        padding: 18px;
+      }
+
+      .image-box img {
+        width: min(100%, 280px);
+        max-height: 265px;
+      }
+
+      .image-caption {
+        height: auto;
+        min-height: 82px;
+        padding: 12px 16px 18px;
+        font-size: 1.28rem;
+        line-height: 1.5;
+      }
+
+      .new-staff-guide {
+        padding: 26px 22px;
+      }
+
+      .new-staff-heading h2 {
+        font-size: 1.45rem;
+      }
+
+      .new-staff-link-card {
+        min-height: 136px;
+        padding: 22px;
+      }
+
+      .new-staff-link-card .step-number {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+        font-size: 1rem;
+      }
+
+      .new-staff-link-text strong {
+        font-size: 1.2rem;
+        line-height: 1.45;
+      }
+
+      .new-staff-link-text small {
+        font-size: 1.05rem;
+        line-height: 1.5;
+      }
+
+      .link-arrow {
+        font-size: 2.2rem;
+      }
+
+      .map-container {
+        height: min(65vh, 580px) !important;
+        min-height: 380px;
+        max-height: 580px;
+      }
+
+      .poster-slider-wrapper {
+        height: clamp(560px, 145vw, 720px);
+      }
+
+      .slider-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.15rem;
+      }
+
+      .footer {
+        padding: 42px 0 26px;
+        font-size: 1.05rem;
+        line-height: 1.8;
+      }
+
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .footer-about h3,
+      .footer-links h4 {
+        margin-bottom: 14px;
+        font-size: 1.3rem;
+        line-height: 1.45;
+      }
+
+      .footer-about p,
+      .footer-links a {
+        font-size: 1.05rem;
+        line-height: 1.4;
+      }
+
+      .footer-links li {
+        margin-bottom: 6px;
+        line-height: 1.35;
+      }
+
+      .qr-image-box img {
+        width: 180px;
+        height: 180px;
+      }
+
+      .footer-bottom {
+        margin-top: 26px;
+        padding-top: 20px;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container,
+      .grid-section-container {
+        width: 100%;
+        max-width: 100%;
+        padding-right: 12px !important;
+        padding-left: 12px !important;
+      }
+
+      .image-grid-container,
+      .poster-slider-container {
+        width: 100%;
+        max-width: 100%;
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+    }
+  </style>
 </head>
-<body class="font-sans text-slate-800" style="min-height:100vh;min-height:100dvh;">
 
-    <!-- พื้นหลังลายเหลี่ยมโทนเทาอมฟ้า (เคลื่อนที่ช้าๆ ตามการเลื่อนหน้า) -->
-    <div id="bgFx" aria-hidden="true" style="position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;">
-        <div data-parallax="1" style="position:absolute;left:-4%;top:-15%;width:108%;height:130%;will-change:transform;">
-            <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="bgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fb5bb" stop-opacity=".30"/><stop offset="1" stop-color="#cfdcdf" stop-opacity=".06"/></linearGradient>
-                    <linearGradient id="bgB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8c9cd" stop-opacity=".26"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
-                    <linearGradient id="bgC" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#8fa8af" stop-opacity=".22"/><stop offset="1" stop-color="#dde7e9" stop-opacity=".04"/></linearGradient>
-                </defs>
-                <polygon points="0,0 620,0 560,420" fill="url(#bgB)"/>
-                <polygon points="620,0 1320,0 560,420" fill="url(#bgA)"/>
-                <polygon points="1320,0 1060,730 560,420" fill="url(#bgB)"/>
-                <polygon points="0,0 560,420 0,560" fill="url(#bgC)"/>
-                <polygon points="0,560 560,420 380,1000 0,1000" fill="url(#bgA)"/>
-                <polygon points="560,420 380,1000 900,1000" fill="url(#bgB)"/>
-            </svg>
+<body>
+
+  <!-- Navbar (รวมจาก Navbar.html) -->
+  <nav class="navbar" aria-label="เมนูหลัก">
+    <div class="navbar-container">
+      <a href="index.html" class="brand-logo" aria-label="Si_HR ID card หน้าแรก">
+        <img src="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw" alt="Si_HR ID card">
+      </a>
+
+      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="เปิดหรือปิดเมนู">
+      <label for="menu-toggle" class="hamburger" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </label>
+
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">หน้าแรก</a></li>
+        <li class="nav-item"><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- เนื้อหาหลัก (จาก ID_Card.html) -->
+  <main class="main-container">
+    <div class="grid-section-container">
+      <div class="main-content">
+
+        <h2 class="page-title-banner">บริการ</h2>
+
+        <div class="image-grid-container">
+          <div class="image-grid">
+
+            <!-- บัตรพนักงานชำรุด -->
+            <a href="damaged-card.html">
+              <div class="image-card">
+                <div class="image-box">
+                  <img src="https://lh3.googleusercontent.com/d/1MzKDbjQoeiV07Se1hoNVpm5_tr8VKAsE" alt="บัตรพนักงานชำรุด">
+                </div>
+                <div class="image-caption">บัตรพนักงาน ชำรุด</div>
+              </div>
+            </a>
+
+            <!-- บัตรพนักงานหาย -->
+            <a href="lost-card.html">
+              <div class="image-card">
+                <div class="image-box">
+                  <img src="https://lh3.googleusercontent.com/d/1KXcqbKx3KX5I4AiE3S2kB2IRbgbsQtMG" alt="บัตรพนักงานหาย">
+                </div>
+                <div class="image-caption">บัตรพนักงาน หาย</div>
+              </div>
+            </a>
+
+            <!-- สถานะเครื่องทาบบัตร -->
+            <a href="https://script.google.com/a/macros/mahidol.ac.th/s/AKfycbxuYeQPDYXIbxB6ROxBqL5co1UIuEZ9-amtrfliqVVP99YvoS6bTbf8n7tzc4YjAnLv/exec" target="_blank" rel="noopener noreferrer">
+              <div class="image-card">
+                <div class="image-box">
+                  <img src="https://lh3.googleusercontent.com/d/1tmFdGtsVgbZkvyIh-hMwC46C8wxkjowQ" alt="สถานะเครื่องทาบบัตร">
+                </div>
+                <div class="image-caption">สถานะเครื่องทาบบัตร</div>
+              </div>
+            </a>
+
+            <!-- คู่มือระบบตรวจสอบการลงเวลา -->
+            <a href="https://script.google.com/a/macros/mahidol.ac.th/s/AKfycbzzKFKj94mGUvDLJUY96dC493_Iflb0sOG8R6YpteW5SuWNCYnJIGPvWgjF8Bvv3HKj/exec" target="_blank" rel="noopener noreferrer">
+              <div class="image-card">
+                <div class="image-box">
+                  <img src="https://lh3.googleusercontent.com/d/1Ao64DWcdWOHHdDG-63X2jXXSx6j0qG5H" alt="คู่มือการเข้าใช้งานระบบตรวจสอบการลงเวลา">
+                </div>
+                <div class="image-caption">
+                  คู่มือการเข้าใช้งานระบบ<br>ตรวจสอบการลงเวลา
+                </div>
+              </div>
+            </a>
+
+            <!-- ขั้นตอนการบันทึกเวลา -->
+            <a href="time-recording-guide.html">
+              <div class="image-card">
+                <div class="image-box">
+                  <svg class="time-menu-icon" viewBox="0 0 160 160" role="img" aria-label="นาฬิกาสำหรับบันทึกเวลา">
+                    <circle cx="80" cy="80" r="68" fill="#e5f4e9" />
+                    <circle cx="80" cy="80" r="48" fill="#ffffff" stroke="#0f5132" stroke-width="7" />
+                    <path d="M80 49v33l24 15" fill="none" stroke="#0f5132" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M64 10h32M64 150h32" stroke="#547b61" stroke-width="8" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <div class="image-caption">ขั้นตอนการบันทึกเวลา</div>
+              </div>
+            </a>
+
+          </div>
         </div>
-        <div data-parallax="0.65" style="position:absolute;left:-4%;top:-15%;width:108%;height:130%;will-change:transform;">
-            <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="1100,0 1600,0 1600,380" fill="url(#bgC)" opacity=".7"/>
-                <polygon points="1600,380 1200,520 1600,900" fill="url(#bgA)" opacity=".6"/>
-                <polygon points="700,1000 1250,620 1600,1000" fill="url(#bgB)" opacity=".8"/>
-                <polygon points="200,200 520,60 700,300" fill="url(#bgC)" opacity=".5"/>
-            </svg>
+
+        <hr>
+
+        <!-- สำหรับพนักงานบรรจุใหม่ -->
+        <section class="new-staff-guide">
+          <div class="new-staff-heading">
+            <h2>สำหรับพนักงานบรรจุใหม่</h2>
+          </div>
+
+          <div class="new-staff-links">
+            <a class="new-staff-link-card" href="new-employee-card.html">
+              <span class="step-number">01</span>
+              <span class="new-staff-link-text">
+                <strong>ขั้นตอนทำบัตรพนักงานบรรจุใหม่</strong>
+                <small>ดูขั้นตอนและเอกสารที่ต้องเตรียม</small>
+              </span>
+              <span class="link-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+
+            <a class="new-staff-link-card" href="internet-guide.html">
+              <span class="step-number">02</span>
+              <span class="new-staff-link-text">
+                <strong>ขั้นตอนการสมัครใช้งาน Free Internet Account</strong>
+                <small>ดูวิธีสมัครใช้งาน Free Internet Account</small>
+              </span>
+              <span class="link-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </section>
+
+        <hr>
+
+        <!-- แผนที่ (ชี้ไปที่ GitHub Pages แผนที่ที่สร้างไว้) -->
+        <div class="map-container">
+          <iframe
+            src="https://papinwitsam.github.io/siriraj-card-map/"
+            width="100%"
+            height="100%"
+            style="border: 0; border-radius: 8px;"
+            allowfullscreen>
+          </iframe>
         </div>
-        <div data-parallax="0.35" style="position:absolute;left:-4%;top:-15%;width:108%;height:130%;will-change:transform;">
-            <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="880,160 1040,300 760,360" fill="url(#bgA)" opacity=".5"/>
-                <polygon points="1380,560 1520,700 1260,760" fill="url(#bgA)" opacity=".5"/>
-                <polygon points="120,720 260,860 40,900" fill="url(#bgA)" opacity=".5"/>
-                <polygon points="980,820 1120,940 860,960" fill="url(#bgA)" opacity=".45"/>
-            </svg>
+
+        <br>
+      </div>
+
+      <!-- สื่อประชาสัมพันธ์ -->
+      <h2 class="page-title-banner">สื่อประชาสัมพันธ์</h2>
+
+      <div class="poster-slider-container">
+        <div class="poster-slider-wrapper">
+
+          <button class="slider-btn prev" onclick="moveSlide(-1)" aria-label="เลื่อนโปสเตอร์ก่อนหน้า">
+            &#10094;
+          </button>
+          <button class="slider-btn next" onclick="moveSlide(1)" aria-label="เลื่อนโปสเตอร์ถัดไป">
+            &#10095;
+          </button>
+
+          <div class="poster-slides" id="posterSlides">
+            <div class="poster-slide">
+              <img src="https://lh3.googleusercontent.com/d/1p2bYehZKLTsUDFuSaKD73L88STmVhKTY" class="poster-bg-blur" alt="" aria-hidden="true">
+              <img src="https://lh3.googleusercontent.com/d/1p2bYehZKLTsUDFuSaKD73L88STmVhKTY" alt="โปสเตอร์ประชาสัมพันธ์ 1">
+            </div>
+
+            <div class="poster-slide">
+              <img src="https://lh3.googleusercontent.com/d/1LsRslHw8bgGKkA-_j0Hh54Bbmb5_7h_n" class="poster-bg-blur" alt="" aria-hidden="true">
+              <img src="https://lh3.googleusercontent.com/d/1LsRslHw8bgGKkA-_j0Hh54Bbmb5_7h_n" alt="โปสเตอร์ประชาสัมพันธ์ 2">
+            </div>
+
+            <div class="poster-slide">
+              <img src="https://lh3.googleusercontent.com/d/1pc4wAUBtdFqz4mg_Xm4aV3Edn9Mp1m1d" class="poster-bg-blur" alt="" aria-hidden="true">
+              <img src="https://lh3.googleusercontent.com/d/1pc4wAUBtdFqz4mg_Xm4aV3Edn9Mp1m1d" alt="โปสเตอร์ประชาสัมพันธ์ 3">
+            </div>
+
+            <div class="poster-slide">
+              <img src="https://lh3.googleusercontent.com/d/1c1IlvbdfFsJ7xsNHm33H0rqQc73-g9Au" class="poster-bg-blur" alt="" aria-hidden="true">
+              <img src="https://lh3.googleusercontent.com/d/1c1IlvbdfFsJ7xsNHm33H0rqQc73-g9Au" alt="โปสเตอร์ประชาสัมพันธ์ 4">
+            </div>
+          </div>
+
+          <div class="slider-dots" id="sliderDots">
+            <span class="dot active" onclick="currentSlide(0)" aria-label="แสดงโปสเตอร์ที่ 1"></span>
+            <span class="dot" onclick="currentSlide(1)" aria-label="แสดงโปสเตอร์ที่ 2"></span>
+            <span class="dot" onclick="currentSlide(2)" aria-label="แสดงโปสเตอร์ที่ 3"></span>
+            <span class="dot" onclick="currentSlide(3)" aria-label="แสดงโปสเตอร์ที่ 4"></span>
+          </div>
+
         </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site footer (รวมจาก Footer.html) -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-about" id="contact">
+        <h3>ติดต่อห้องทำบัตร</h3>
+        <p>ตึกท่านผู้หญิงวิจิตรา</p>
+        <p>โทรศัพท์: 0-2419-7180</p>
+        <p>วันที่ให้บริการ: จันทร์ | พุธ | ศุกร์</p>
+        <p>เวลาทำการ: 08:30–16:30 น. (พักเที่ยง)</p>
+        <p>Email: papinwit.sam@mahidol.ac.th</p>
+      </div>
+
+      <nav class="footer-links" aria-label="เมนูด่วน">
+        <h4>เมนูด่วน</h4>
+        <ul>
+          <li><a href="damaged-card.html">บัตรพนักงานชำรุด</a></li>
+          <li><a href="lost-card.html">บัตรพนักงานหาย</a></li>
+          <li><a href="new-employee-card.html">ทำบัตรพนักงานบรรจุใหม่</a></li>
+          <li><a href="time-recording-guide.html">ขั้นตอนการบันทึกเวลา</a></li>
+          <li><a href="internet-guide.html">สมัครใช้งาน Internet</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-links">
+        <h4>LINE: Si_HR ID Card</h4>
+        <div class="qr-image-box">
+          <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code สำหรับ LINE Si_HR ID Card" loading="lazy">
+        </div>
+      </div>
     </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 w-full bg-white border-b border-slate-200 px-3 py-2 md:px-6 flex-none flex items-center justify-between shadow-sm z-30 min-h-[52px]">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 md:w-8 md:h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-base md:text-sm shadow-sm flex-none">
-                <i class="fa-solid fa-hospital-user"></i>
-            </div>
-            <div class="min-w-0">
-                <h1 class="font-bold text-sm lg:text-base text-slate-800 leading-tight truncate">แผนที่ตำแหน่งเครื่องทาบบัตรพนักงาน</h1>
-                <p class="text-[10px] md:text-xs text-slate-500 leading-none hidden sm:block">โรงพยาบาลศิริราช</p>
-            </div>
-        </div>
-        <a href="https://script.google.com/a/macros/mahidol.ac.th/s/AKfycbxuYeQPDYXIbxB6ROxBqL5co1UIuEZ9-amtrfliqVVP99YvoS6bTbf8n7tzc4YjAnLv/exec" target="_blank" rel="noopener noreferrer"
-           class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap flex-none ml-2">
-            <span>สถานะเครื่อง</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-        </a>
-    </header>
-
-    <!-- กรอบเนื้อหา: บน PC จะเว้นระยะซ้าย-ขวา -->
-    <div class="w-full max-w-5xl mx-auto md:shadow-[0_0_18px_rgba(15,23,42,0.07)]">
-
-
-    <!-- ส่วนบน: แผนที่ (ย่อส่วน) -->
-    <section id="mapSection" class="relative flex-none bg-slate-200 border-b border-slate-300 overflow-hidden" style="height:52vh;height:52dvh;">
-
-        <!-- ปุ่มควบคุมแผนที่ -->
-        <div class="absolute top-2 right-2 z-20 flex flex-col gap-0.5 bg-white/90 backdrop-blur-md p-1 rounded-xl shadow-lg border border-slate-200">
-            <button onclick="zoomIn()" title="ขยาย" class="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-plus text-sm"></i></button>
-            <button onclick="zoomOut()" title="ย่อ" class="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-minus text-sm"></i></button>
-            <button onclick="resetZoom()" title="รีเซ็ตมุมมอง" class="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-rotate-left text-xs"></i></button>
-            <button onclick="toggleMapSize()" title="ขยาย/ย่อพื้นที่แผนที่" class="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 flex items-center justify-center active:scale-95 transition-all"><i id="expandIcon" class="fa-solid fa-up-right-and-down-left-from-center text-xs"></i></button>
-            <button id="locateBtn" onclick="locateMe()" title="ตำแหน่งของฉัน" class="hidden w-8 h-8 rounded-lg hover:bg-blue-50 text-blue-600 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-location-crosshairs text-sm"></i></button>
-        </div>
-
-        <div id="mapViewport" class="map-viewport w-full h-full relative flex items-center justify-center">
-            <div id="mapContainer" class="relative flex-none origin-center" style="width:100%;transform:translate(0px,0px) scale(1);">
-                <img id="mapImage" src="https://lh3.googleusercontent.com/d/1STtaBl-Y57uJkbrwqhSNDtK8SOGYEWJp=s0" alt="แผนที่โรงพยาบาลศิริราช"
-                     class="block w-full h-full rounded-md shadow-xl pointer-events-none" draggable="false"
-                     onload="fitMap()" onerror="handleImageError(this)">
-                <div id="hotspotContainer" class="absolute inset-0"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- แถบคำอธิบายสัญลักษณ์ -->
-    <div class="flex-none bg-white border-b border-slate-200 px-3 py-2.5 text-sm sm:text-base text-slate-800 flex items-center gap-4 sm:gap-5 overflow-x-auto whitespace-nowrap">
-        <span class="flex items-center gap-1.5 font-medium"><span class="w-4 h-4 rounded-full bg-emerald-700 border-2 border-white shadow inline-block"></span>ปกติ <b id="cntNormal" class="text-emerald-700">0</b></span>
-        <span class="flex items-center gap-1.5 font-medium"><span class="w-4 h-4 rounded-full border-2 border-white shadow inline-block" style="background:#ef4444"></span>ขัดข้อง <b id="cntOffline" class="text-red-600">0</b></span>
-        <span id="legendUser" class="hidden items-center gap-1.5 font-medium"><span class="w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow inline-block"></span>คุณอยู่ที่นี่</span>
-        <span class="text-slate-500 flex items-center gap-1.5 ml-auto"><i class="fa-solid fa-hand-pointer text-emerald-600"></i>แตะจุดหรือการ์ดเพื่อดูรายละเอียด</span>
+    <div class="footer-bottom">
+      <p>Website: Si_HR ID card<br>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล มหาวิทยาลัยมหิดล</p>
     </div>
+  </footer>
 
-    <!-- ส่วนล่าง: กล่องจุดทาบบัตร -->
-    <section>
+  <!-- Script สไลด์โปสเตอร์ -->
+  <script>
+    let currentIndex = 0;
+    const slides = document.getElementById('posterSlides');
+    const dots = document.querySelectorAll('#sliderDots .dot');
+    const totalSlides = dots.length;
+    let autoSlideTimer;
 
-        <!-- แถบค้นหา / กรอง / เรียง -->
-        <div class="sticky top-[52px] z-[25] px-3 pt-2.5 pb-2 bg-white border-b border-slate-200 space-y-2">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" id="searchInput" oninput="filterBuildings()" placeholder="ค้นหาชื่ออาคาร, เลขจุด..."
-                       class="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
-                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-circle-xmark text-sm"></i>
-                </button>
-            </div>
-
-            <div class="flex items-center gap-2 overflow-x-auto pb-0.5">
-                <button id="gpsBtn" onclick="toggleGPS()" class="hidden flex-none items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-95 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-location-crosshairs"></i><span id="gpsBtnText">เปิดใช้งาน GPS</span>
-                </button>
-
-                <button data-filter="all" onclick="setStatusFilter('all')" class="filter-chip flex-none px-3 py-1.5 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-600 whitespace-nowrap">ทั้งหมด</button>
-                <button data-filter="normal" onclick="setStatusFilter('normal')" class="filter-chip flex-none px-3 py-1.5 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-600 whitespace-nowrap">ปกติ</button>
-                <button data-filter="offline" onclick="setStatusFilter('offline')" class="filter-chip flex-none px-3 py-1.5 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-600 whitespace-nowrap">ขัดข้อง</button>
-
-                <select id="sortSelect" onchange="setSort(this.value)" class="flex-none ml-auto px-2.5 py-1.5 rounded-full text-xs font-medium border border-slate-300 bg-white text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="number">เรียงตาม: เลขจุด</option>
-                    <option value="name">ชื่อสถานที่ (ก-ฮ)</option>
-                    <option value="nearest" id="optNearest" disabled hidden>ใกล้ที่สุดก่อน</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- รายการการ์ด -->
-        <div id="listScroll" class="p-4 md:px-10">
-            <div class="flex items-center justify-between mb-2">
-                <h2 class="font-bold text-slate-700 text-sm sm:text-base inline-block bg-white/85 backdrop-blur px-3 py-1 rounded-full shadow-sm"><i class="fa-solid fa-location-dot text-emerald-600"></i> จุดทาบบัตรทั้งหมด · <span id="resultCount">0</span> จุด</h2>
-            </div>
-            <div id="buildingList" class="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"></div>
-            <div class="h-6"></div>
-        </div>
-    </section>
-
-    </div><!-- /กรอบเนื้อหา -->
-
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-3 opacity-0 pointer-events-none z-[60] bg-slate-800 text-white text-sm px-4 py-2 rounded-xl shadow-xl max-w-[90vw] text-center"></div>
-
-    <!-- Modal Detail Popup -->
-    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 modal-backdrop hidden opacity-0 transition-opacity duration-300">
-        <div id="modalCard" class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-sm sm:max-w-md w-full overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
-
-            <div class="relative bg-gradient-to-r from-emerald-700 to-teal-800 text-white p-4 pr-10 flex-none">
-                <button onclick="closeModal()" class="absolute right-3 top-3 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
-                <div class="flex items-center gap-2 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-1">
-                    <span id="modalCategory" class="bg-emerald-800/80 px-2.5 py-0.5 rounded-full border border-emerald-600/50">หมวดหมู่</span>
-                </div>
-                <h2 id="modalTitle" class="text-base sm:text-lg font-bold leading-tight">ชื่ออาคาร / สถานที่</h2>
-            </div>
-
-            <div class="p-4 overflow-y-auto space-y-3 text-xs sm:text-sm text-slate-600 flex-1">
-                <div class="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 group">
-                    <img id="modalImage" src="" alt="รูปภาพสถานที่" class="w-full h-full object-cover transition-all duration-300">
-                    <button id="prevImgBtn" type="button" onclick="prevImage(event)" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition-all active:scale-90 z-10">
-                        <i class="fa-solid fa-chevron-left text-xs pointer-events-none"></i>
-                    </button>
-                    <button id="nextImgBtn" type="button" onclick="nextImage(event)" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition-all active:scale-90 z-10">
-                        <i class="fa-solid fa-chevron-right text-xs pointer-events-none"></i>
-                    </button>
-                    <div id="imageCounter" class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2.5 py-0.5 rounded-full backdrop-blur-sm font-medium z-10">1/1</div>
-                </div>
-
-                <div>
-                    <h3 class="font-semibold text-xs uppercase tracking-wider text-slate-400 mb-1">รายละเอียด</h3>
-                    <p id="modalDesc" class="text-slate-700 leading-relaxed"></p>
-                </div>
-            </div>
-
-            <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2 flex-none">
-                <a id="modalNavBtn" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium transition-all shadow-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-diamond-turn-right"></i> นำทางด้วย Google Maps
-                </a>
-                <button onclick="closeModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-medium transition-all shadow-sm">ปิดหน้าต่าง</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-// URL Google Sheet ในรูปแบบ gviz/tq สำหรับดึงข้อมูลทะลุระบบ CORS
-const SHEET_GVIZ_URL = 'https://docs.google.com/spreadsheets/d/1ueSuu1U0sht1I1bxVdt7ZsXLIGWjZpaBLEuESTCeOyo/gviz/tq?tqx=responseHandler:handleSheetData';
-
-const buildingData = [
-    { id: 1, number: "1", name: "ตึกชัยนาทนเรนทรานุสรณ์", category: "จุดที่ 1", coords: { x: 55.8, y: 74.3 }, images: [ "https://placehold.co/600x400/1e293b/ffffff?text=Shooting+in+Progress+1", "https://placehold.co/600x400/0f766e/ffffff?text=Shooting+in+Progress+2" ], desc: "ตึกชัยนาทนเรนทรานุสรณ์", status: "normal" },
-    { id: 2, number: "2", name: "ตึกอัษฎางค์", category: "จุดที่ 2", coords: { x: 40.3, y: 74.6 }, images: ["https://lh3.googleusercontent.com/d/1d1LiWQFBw4no7G53THkrT1LTvlb7QLPu", "https://lh3.googleusercontent.com/d/1lkDDZZobd62n4XzY5S3qdNnqwsVvYQ3U"], desc: "ตึกอัษฎางค์", status: "normal" },
-    { id: 3, number: "3", name: "อาคาร 100 ปี สมเด็จพระศรีนครินทร์", category: "จุดที่ 3", coords: { x: 33.8, y: 65.3 }, images: ["https://lh3.googleusercontent.com/d/1S00SCoorm5EOLfo4r4E7sXbx1hiuM-1Y=s0", "https://lh3.googleusercontent.com/d/1U9Kc_VI8qtop4YAxjMQNNCe_-FNiKk4r=s0"], desc: "อาคาร 100 ปี สมเด็จพระศรีนครินทร์", status: "normal" },
-    { id: 4, number: "4", name: "ตึก 72 ปี", category: "จุดที่ 4", coords: { x: 34.7, y: 52.7 }, images: ["https://lh3.googleusercontent.com/d/1-KLJOm5XLDU9c6ePNTq94fp2HofCNqdT=s0", "https://lh3.googleusercontent.com/d/1aoOWMCgzKKyWgoWnfKq06zikmE3afd6R=s0"], desc: "ตึก 72 ปี", status: "normal" },    
-    { id: 5, number: "5", name: "ตึกกุมารฯ (S&P)", category: "จุดที่ 5", coords: { x: 26.6, y: 58.9 }, images: ["https://lh3.googleusercontent.com/d/1SFjlq3NCycEDS6V37MPp_pbctM567QjB=s0", "https://lh3.googleusercontent.com/d/11wxQ3WVNPS2o4fhgtpWmVdyqXz7l-Q3s=s0"], desc: "", status: "normal" },
-    { id: 6, number: "6", name: "ตึกอานันทมหิดล", category: "จุดที่ 6", coords: { x: 20.3, y: 54.4 }, images: ["https://lh3.googleusercontent.com/d/1SfTmCPDLkhJSzw1KYrMoxgXQtaaWGcuD=s0", "https://lh3.googleusercontent.com/d/1pnnVzjU22HSRhyJ1WNJjSR4lzFNGqQOP=s0"], desc: "ตึกอานันทมหิดล", status: "normal" },
-    { id: 7, number: "7", name: "OPD ใต้ดิน", category: "จุดที่ 7", coords: { x: 12.8, y: 38.6 }, images: ["https://lh3.googleusercontent.com/d/1PXXguoUs6iqChyD3FVxyuf8CzM9TFabi=s0", "https://lh3.googleusercontent.com/d/1CrIbFe5U-JLCNOY800F8l3qnBoMGIzyP=s0"], desc: "OPD ใต้ดิน", status: "normal" },
-    { id: 8, number: "8", name: "OPD คลินิกพิเศษ ชั้น 1", category: "จุดที่ 8", coords: { x: 17.5, y: 41.7 }, images: ["https://lh3.googleusercontent.com/d/1KO0c1AAIbPgDkf-ilfYw2RzkphCKa6--=s0"], desc: "OPD คลินิกพิเศษ ชั้น 1", status: "normal" },
-    { id: 9, number: "9", name: "OPD ฝ่ายเภสัชกรรม", category: "จุดที่ 9", coords: { x: 15.6, y: 36.4 }, images: ["https://lh3.googleusercontent.com/d/1ndLW6zYt-dXC3ZjBke9MVEBcIHCgAngm=s0", "https://lh3.googleusercontent.com/d/1wt6uOUtbdVFWJclJ0cVuJaQ6OcYME609=s0"], desc: "OPD ฝ่ายเภสัชกรรม", status: "normal" },
-    { id: 10, number: "10", name: "ตึกสลากกินแบ่งรัฐบาล", category: "จุดที่ 10", coords: { x: 20.3, y: 21.6 }, images: ["https://placehold.co/600x400/1e293b/ffffff?text=Shooting+in+Progress+1", "https://placehold.co/600x400/0f766e/ffffff?text=Shooting+in+Progress+2"], desc: "ตึกสลากกินแบ่งรัฐบาล", status: "normal" },
-    { id: 11, number: "11", name: "หอพักแพทย์ประจำบ้าน", category: "จุดที่ 11", coords: { x: 23.5, y: 25.0 }, images: ["https://lh3.googleusercontent.com/d/1lyzHX6Yt1QxX715HyLYl0__S8oLnsFB-=s0", "https://lh3.googleusercontent.com/d/1wZ0DmOy75RPo2OgZHIRi72RvodBpoGDk=s0"], desc: "หอพักแพทย์ประจำบ้าน", status: "normal" },
-    { id: 12, number: "12", name: "ตึก 84 ปี", category: "จุดที่ 12", coords: { x: 35.7, y: 40.1 }, images: ["https://lh3.googleusercontent.com/d/1-xWTwW9jlZucHguxzFcHV0BvZkuUA5MG=s0", "https://lh3.googleusercontent.com/d/1-xWTwW9jlZucHguxzFcHV0BvZkuUA5MG=s0"], desc: "ตึก 84 ปี", status: "normal" },
-    { id: 13, number: "13", name: "ตึกสยามินทร์", category: "จุดที่ 13", coords: { x: 40.9, y: 46.7 }, images: ["https://placehold.co/600x400/1e293b/ffffff?text=Shooting+in+Progress+1", "https://placehold.co/600x400/0f766e/ffffff?text=Shooting+in+Progress+2"], desc: "ตึกสยามินทร์", status: "normal" },
-    { id: 14, number: "14", name: "ตึกโภชนาการ", category: "จุดที่ 14", coords: { x: 42.3, y: 30.1 }, images: ["https://lh3.googleusercontent.com/d/13npG_G-StDswKDVekjvVhNi6OXcRnYgX=s0", "https://lh3.googleusercontent.com/d/1pDJZm18MEFcmOHJlNZljNzbAoa5xfsRq=s0"], desc: "ตึกโภชนาการ", status: "normal" },    
-    { id: 15, number: "15", name: "ตึกจุลชีววิทยา", category: "จุดที่ 15", coords: { x: 49.4, y: 38.4 }, images: ["https://lh3.googleusercontent.com/d/1j8e4u1JCmWAVRh6vE7eMp_QULfHSivcY=s0", "https://lh3.googleusercontent.com/d/19y_i2mdKgUI9wLFTokId830bOrUTxqnw=s0"], desc: "ตึกจุลชีววิทยา", status: "normal" },
-    { id: 16, number: "16", name: "ตึกอดุลยเดชวิกรม", category: "จุดที่ 16", coords: { x: 49.4, y: 27.6 }, images: ["https://lh3.googleusercontent.com/d/1V8xn1tk7RGq40PGj8GKOk3O8AzsFXMMQ=s0", "https://lh3.googleusercontent.com/d/139SA_bM6XAR7LFpOwXL_bwwJJsVYhK4t=s0"], desc: "ตึกอดุลยเดชวิกรม", status: "normal" },  
-    { id: 17, number: "17", name: "อาคารฝ่ายเภสัชกรรม", category: "จุดที่ 17", coords: { x: 81.9, y: 38.1 }, images: ["https://lh3.googleusercontent.com/d/1uMUyfdqUYkpoFoGojnElkG9rnaAbWhvr=s0", "https://lh3.googleusercontent.com/d/1l8aBGYOj99zo7_YfpXrHfdoeO-SpTU1G=s0"], desc: "อาคารฝ่ายเภสัชกรรม", status: "normal" },
-    { id: 18, number: "18", name: "อาคารศรีสวรินทิรา", category: "จุดที่ 18", coords: { x: 65.2, y: 37.9 }, images: ["https://placehold.co/600x400/1e293b/ffffff?text=Shooting+in+Progress+1", "https://placehold.co/600x400/0f766e/ffffff?text=Shooting+in+Progress+2"], desc: "อาคารศรีสวรินทิรา", status: "normal" },
-    { id: 19, number: "19", name: "ตึกเฉลิมพระเกียรติฯ", category: "จุดที่ 19", coords: { x: 53.8, y: 54.6 }, images: ["https://lh3.googleusercontent.com/d/1CGlKXtQURCxLGnohdC4-1v_GlrrMnnOt", "https://lh3.googleusercontent.com/d/1WPRYHTwnm6tMYS_6wIwgp-yM9nXf1xht"], desc: "ตึกเฉลิมพระเกียรติฯ", status: "normal" },    
-    { id: 20, number: "20", name: "อาคารเฉลิมพระเกียรติ 80 พรรษาฯ (SiMR)", category: "จุดที่ 20", coords: { x: 64.8, y: 14.4 }, images: ["https://lh3.googleusercontent.com/d/1F98FD8X1sf3mW7o-EWAGPRtWgTIzeE8h", "https://lh3.googleusercontent.com/d/1tmzhcXG8fQpveFhK3TxWb8KfkAwwPBHz"], desc: "อาคารเฉลิมพระเกียรติ 80 พรรษาฯ (SiMR)", status: "normal" },
-    { id: 21, number: "21", name: "SkyWalk (ช่วงประตู 5 / งานบริการผ้า)", category: "จุดที่ 21", coords: { x: 50.2, y: 16.2 }, images: ["https://lh3.googleusercontent.com/d/1p5IC5a2Z0gM7024VHsgobBohAqMFwiFD", "https://lh3.googleusercontent.com/d/1gDO2dmAnX7A17rK6xp4Qi1X9avK4rr_y"], desc: "SkyWalk (ช่วงประตู 5 / งานบริการผ้า)", status: "normal" },
-    { id: 22, number: "22", name: "SkyWalk (ช่วงอาคารศิริราชบำรุงเวช)", category: "จุดที่ 22", coords: { x: 31.6, y: 37.7 }, images: ["https://lh3.googleusercontent.com/d/19kftHaOnGSmv4B4QJRbuwvF7IxwDho5z", "https://lh3.googleusercontent.com/d/111-6zPPjikW6etHuBv_6s1EwA6xP3s6D"], desc: "SkyWalk (ช่วงอาคารศิริราชบำรุงเวช)", status: "normal" },    
-    { id: 23, number: "23", name: "SkyWalk (ช่วงประตู 1 / ตึกอุบัติเหตุ)", category: "จุดที่ 23", coords: { x: 18.3, y: 50.4 }, images: ["https://lh3.googleusercontent.com/d/1-p_SGoxta_4qRlLO81JScgksTdOHvqYY", "https://lh3.googleusercontent.com/d/1JNlL2gjIq27YYn_EDoPKC5zJuy3YucaG"], desc: "SkyWalk (ช่วงประตู 1 / ตึกอุบัติเหตุ)", status: "normal" }        
-];
-
-/* =====================================================================
-   พิกัด GPS ของแต่ละจุด (ไม่บังคับ) — รูปแบบ  id: [ละติจูด, ลองจิจูด]
-   เมื่อใส่พิกัดแล้ว ระบบจะแสดงปุ่ม "เปิดใช้งาน GPS", ระยะทาง, เรียง "ใกล้ที่สุดก่อน"
-   และปุ่มนำทางจะพาไปยังพิกัดจริงบน Google Maps
-   ถ้าใส่พิกัดตั้งแต่ 3 จุดขึ้นไป (ไม่อยู่ในแนวเส้นตรงเดียวกัน) ระบบจะวางจุด "คุณอยู่ที่นี่" บนแผนที่ให้อัตโนมัติ
-   ตัวอย่าง:
-       1: [13.7590, 100.4850],
-       2: [13.7595, 100.4838],
-   ===================================================================== */
-const GPS_COORDS = {
-    // 1: [13.0000, 100.0000],
-};
-
-buildingData.forEach(b => {
-    const c = GPS_COORDS[b.id];
-    b.lat = c ? c[0] : null;
-    b.lng = c ? c[1] : null;
-    b.distance = null;
-});
-
-/* ---------------- สถานะ ---------------- */
-let zoomLevel = 1, panX = 0, panY = 0;
-let baseW = 0, baseH = 0;
-let selectedId = null;
-let statusFilter = 'all';
-let sortMode = 'number';
-let mapExpanded = false;
-
-let currentImageIndex = 0;
-let currentImageList = [];
-
-let gpsOn = false, watchId = null, firstFix = true;
-let userPos = null, userXY = null, affine = null;
-
-const mapSection = document.getElementById('mapSection');
-const mapViewport = document.getElementById('mapViewport');
-const mapContainer = document.getElementById('mapContainer');
-const mapImage = document.getElementById('mapImage');
-const hotspotContainer = document.getElementById('hotspotContainer');
-const buildingList = document.getElementById('buildingList');
-const searchInput = document.getElementById('searchInput');
-const clearSearchBtn = document.getElementById('clearSearchBtn');
-const resultCount = document.getElementById('resultCount');
-const detailModal = document.getElementById('detailModal');
-const modalCard = document.getElementById('modalCard');
-
-window.addEventListener('DOMContentLoaded', () => {
-    initGpsFeature();
-    fitMap();
-    renderAll();
-    initDragAndZoom();
-    fetchSheetDirectly();
-});
-window.addEventListener('resize', () => { fitMap(); });
-
-/* ---------------- ตัวช่วย ---------------- */
-function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-}
-function isOffline(item) {
-    return item.status === 'offline' || item.status === 'error' || item.status === 'ขัดข้อง';
-}
-function hasAnyCoords() {
-    return buildingData.some(b => b.lat != null && b.lng != null);
-}
-function formatDistance(m) {
-    if (m == null) return '';
-    return m < 1000 ? `${Math.round(m)} ม.` : `${(m / 1000).toFixed(1)} กม.`;
-}
-function navUrl(item) {
-    if (item.lat != null && item.lng != null) {
-        return `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}&travelmode=walking`;
-    }
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.name + ' โรงพยาบาลศิริราช')}&travelmode=walking`;
-}
-let toastTimer = null;
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.remove('opacity-0', 'translate-y-3');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-3'), 2800);
-}
-
-/* ---------------- ดึงสถานะจาก Google Sheet ---------------- */
-function fetchSheetDirectly() {
-    const script = document.createElement('script');
-    script.src = SHEET_GVIZ_URL + '&_=' + new Date().getTime();
-    document.body.appendChild(script);
-}
-
-function handleSheetData(data) {
-    try {
-        const rows = data.table.rows;
-        rows.forEach(row => {
-            if (!row.c || !row.c[0]) return;
-            const rawId = String(row.c[0].v || '');                                   // คอลัมน์ A (READER-xxx)
-            const statusText = row.c[2] ? String(row.c[2].v || '').trim().toLowerCase() : ''; // คอลัมน์ C (Status)
-            const numericId = parseInt(rawId.replace(/\D/g, ''), 10);
-            const building = buildingData.find(b => b.id === numericId || b.number === String(numericId));
-            if (building) building.status = statusText;
-        });
-        renderAll();
-    } catch (err) {
-        console.error("ประมวลผลข้อมูล Sheet ผิดพลาด:", err);
-    }
-}
-
-/* ---------------- แสดงผลทั้งหมด ---------------- */
-function getVisible() {
-    const q = searchInput.value.trim().toLowerCase();
-    let list = buildingData.filter(item => {
-        const matchQ = !q || item.name.toLowerCase().includes(q) || item.number.toLowerCase().includes(q) || String(item.category).toLowerCase().includes(q);
-        const off = isOffline(item);
-        const matchS = statusFilter === 'all' || (statusFilter === 'offline' ? off : !off);
-        return matchQ && matchS;
-    });
-    if (sortMode === 'name') {
-        list.sort((a, b) => a.name.localeCompare(b.name, 'th'));
-    } else if (sortMode === 'nearest') {
-        list.sort((a, b) => {
-            if (a.distance == null && b.distance == null) return a.id - b.id;
-            if (a.distance == null) return 1;
-            if (b.distance == null) return -1;
-            return a.distance - b.distance;
-        });
-    } else {
-        list.sort((a, b) => a.id - b.id);
-    }
-    return list;
-}
-
-function renderAll() {
-    const offCount = buildingData.filter(isOffline).length;
-    document.getElementById('cntOffline').textContent = offCount;
-    document.getElementById('cntNormal').textContent = buildingData.length - offCount;
-
-    document.querySelectorAll('.filter-chip').forEach(btn => {
-        btn.classList.toggle('chip-active', btn.dataset.filter === statusFilter);
-    });
-
-    const visible = getVisible();
-    renderList(visible);
-    renderHotspots(visible);
-}
-
-function renderList(visible) {
-    resultCount.textContent = visible.length;
-    buildingList.innerHTML = '';
-
-    if (visible.length === 0) {
-        buildingList.innerHTML = `
-            <div class="col-span-full p-8 text-center text-slate-400">
-                <i class="fa-solid fa-magnifying-glass-location text-3xl mb-2 text-slate-300"></i>
-                <h3 class="font-semibold text-slate-500 text-sm">ไม่พบจุดทาบบัตรที่คุณค้นหา</h3>
-                <p class="text-xs mb-3">ลองเปลี่ยนคำค้นหา หรือพิมพ์ชื่อสถานที่อื่นดูนะ</p>
-                <button onclick="resetFilters()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-medium">ล้างคำค้นหา</button>
-            </div>`;
-        return;
+    function updateSlide() {
+      if (!slides || totalSlides === 0) return;
+      slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
     }
 
-    // จุดที่อยู่ใกล้ที่สุด (เมื่อมี GPS)
-    let nearestId = null;
-    if (userPos) {
-        const withDist = buildingData.filter(b => b.distance != null);
-        if (withDist.length) nearestId = withDist.reduce((m, b) => b.distance < m.distance ? b : m).id;
+    function moveSlide(direction) {
+      if (totalSlides === 0) return;
+      currentIndex = (currentIndex + direction + totalSlides) % totalSlides;
+      updateSlide();
+      resetAutoSlide();
     }
 
-    visible.forEach(item => {
-        const off = isOffline(item);
-        const first = item.images && item.images[0];
-        const hasRealImg = first && !/placehold\.co/.test(first);
-
-        const thumb = `<i class="fa-solid fa-building text-slate-300 text-3xl"></i>` +
-            (hasRealImg ? `<img src="${esc(first)}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">` : '');
-
-        let tags = '';
-        if (item.id === nearestId) tags += `<span class="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700 text-[10px] font-semibold">ใกล้ที่สุด</span>`;
-        else if (item.distance != null && item.distance < 200) tags += `<span class="px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-700 text-[10px] font-semibold">ใกล้มาก</span>`;
-
-        const distHtml = item.distance != null
-            ? `<span class="ml-auto text-blue-600 font-semibold text-xs whitespace-nowrap"><i class="fa-solid fa-person-walking"></i> ${formatDistance(item.distance)}</span>` : '';
-
-        const card = document.createElement('div');
-        card.id = `card-${item.id}`;
-        card.dataset.id = item.id;
-        card.className = `tap-card bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer hover:border-emerald-300 hover:shadow-md flex flex-col ${selectedId === item.id ? 'selected' : ''}`;
-        card.innerHTML = `
-            <div class="relative h-28 bg-slate-100 flex items-center justify-center overflow-hidden">
-                ${thumb}
-                <span class="absolute top-2 left-2 min-w-[26px] h-[26px] px-1.5 rounded-lg ${off ? 'bg-red-500' : 'bg-emerald-700'} text-white text-xs font-bold flex items-center justify-center shadow">${esc(item.number)}</span>
-            </div>
-            <div class="flex-1 p-2.5 flex flex-col gap-1">
-                <h4 class="font-semibold text-slate-800 text-sm leading-snug line-clamp-2 min-h-[2.5rem]">${esc(item.name)}</h4>
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="inline-flex items-center gap-1 text-[11px] ${off ? 'text-red-600' : 'text-emerald-700'} font-medium">
-                        <span class="inline-block w-1.5 h-1.5 rounded-full ${off ? 'bg-red-500' : 'bg-emerald-500'}"></span>${off ? 'ขัดข้อง' : 'ปกติ'}
-                    </span>
-                    ${tags}
-                    ${distHtml}
-                </div>
-            </div>
-            <a data-act="nav" href="${esc(navUrl(item))}" target="_blank" rel="noopener noreferrer" class="py-2 border-t border-slate-100 text-xs font-medium text-blue-600 hover:bg-blue-50 flex items-center justify-center gap-1.5 transition-colors"><i class="fa-solid fa-diamond-turn-right"></i> นำทาง</a>`;
-
-        card.addEventListener('click', (e) => {
-            if (e.target.closest('[data-act="nav"]')) return; // ปล่อยให้ลิงก์นำทางทำงานตามปกติ
-            selectBuilding(item.id, { center: true });
-            openModal(item.id);
-        });
-        buildingList.appendChild(card);
-    });
-}
-
-function renderHotspots(visible) {
-    visible = visible || getVisible();
-    const filtering = searchInput.value.trim() !== '' || statusFilter !== 'all';
-    const visibleIds = new Set(visible.map(v => v.id));
-
-    hotspotContainer.innerHTML = '';
-    buildingData.forEach(item => {
-        const off = isOffline(item);
-        const dot = document.createElement('div');
-        dot.className = `hotspot-dot ${selectedId === item.id ? 'active' : ''} ${off ? 'status-warning' : ''} ${filtering && !visibleIds.has(item.id) ? 'dimmed' : ''}`;
-        dot.style.left = `${item.coords.x}%`;
-        dot.style.top = `${item.coords.y}%`;
-        dot.dataset.id = item.id;
-        dot.innerHTML = `${esc(item.number)}<div class="hotspot-label">${esc(item.name)} ${off ? '(ขัดข้อง)' : ''}</div>`;
-
-        dot.addEventListener('mousedown', (e) => e.stopPropagation());
-        dot.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-        dot.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectBuilding(item.id);
-            openModal(item.id);
-        });
-        hotspotContainer.appendChild(dot);
-    });
-
-    if (userXY && userXY[0] >= 0 && userXY[0] <= 100 && userXY[1] >= 0 && userXY[1] <= 100) {
-        const u = document.createElement('div');
-        u.className = 'user-dot';
-        u.style.left = `${userXY[0]}%`;
-        u.style.top = `${userXY[1]}%`;
-        u.innerHTML = '<span>คุณอยู่ที่นี่</span>';
-        hotspotContainer.appendChild(u);
+    function currentSlide(index) {
+      if (totalSlides === 0) return;
+      currentIndex = (index + totalSlides) % totalSlides;
+      updateSlide();
+      resetAutoSlide();
     }
-    updateMapTransform();
-}
 
-/* เลือกจุด: ไฮไลต์บนแผนที่และการ์ดโดยไม่ต้องวาดใหม่ทั้งหมด */
-function selectBuilding(id, opts = {}) {
-    selectedId = id;
-    document.querySelectorAll('.tap-card').forEach(c => c.classList.toggle('selected', Number(c.dataset.id) === id));
-    document.querySelectorAll('.hotspot-dot').forEach(d => d.classList.toggle('active', Number(d.dataset.id) === id));
-    const item = buildingData.find(b => b.id === id);
-    if (item && opts.center) centerOnDot(item.coords.x, item.coords.y);
-    if (opts.scrollList) {
-        const card = document.getElementById(`card-${id}`);
-        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    function startAutoSlide() {
+      if (totalSlides <= 1) return;
+      autoSlideTimer = setInterval(() => {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateSlide();
+      }, 4000);
     }
-}
 
-/* ---------------- ค้นหา / กรอง / เรียง ---------------- */
-function filterBuildings() {
-    clearSearchBtn.classList.toggle('hidden', searchInput.value.trim().length === 0);
-    renderAll();
-}
-function clearSearch() {
-    searchInput.value = '';
-    clearSearchBtn.classList.add('hidden');
-    renderAll();
-}
-function resetFilters() {
-    searchInput.value = '';
-    clearSearchBtn.classList.add('hidden');
-    statusFilter = 'all';
-    renderAll();
-}
-function setStatusFilter(f) {
-    statusFilter = f;
-    renderAll();
-}
-function setSort(mode) {
-    if (mode === 'nearest' && !userPos) {
-        document.getElementById('sortSelect').value = sortMode;
-        startGPS();
-        return;
+    function resetAutoSlide() {
+      clearInterval(autoSlideTimer);
+      startAutoSlide();
     }
-    sortMode = mode;
-    renderAll();
-}
 
-/* ---------------- แผนที่: ขนาด / ซูม / ลาก ---------------- */
-function fitMap() {
-    const vw = mapViewport.clientWidth, vh = mapViewport.clientHeight;
-    if (!vw || !vh) return;
-    const aspect = (mapImage.naturalWidth && mapImage.naturalHeight) ? mapImage.naturalWidth / mapImage.naturalHeight : 16 / 9;
-    let w = Math.min(vw - 8, (vh - 8) * aspect);
-    w = Math.max(w, 120);
-    baseW = w;
-    baseH = w / aspect;
-    mapContainer.style.width = baseW + 'px';
-    mapContainer.style.height = baseH + 'px';
-    updateMapTransform();
-}
+    startAutoSlide();
+  </script>
 
-function handleImageError(img) {
-    img.onerror = null;
-    img.src = "https://placehold.co/1200x675/e2e8f0/334155?text=Siriraj+Hospital+Campus+Plan+Map";
-}
-
-function toggleMapSize() {
-    mapExpanded = !mapExpanded;
-    const v = mapExpanded ? 80 : 52;
-    mapSection.style.height = v + 'vh';
-    mapSection.style.height = v + 'dvh';
-    document.getElementById('expandIcon').className = mapExpanded
-        ? 'fa-solid fa-down-left-and-up-right-to-center text-xs'
-        : 'fa-solid fa-up-right-and-down-left-from-center text-xs';
-    fitMap();
-    resetZoom();
-}
-
-function centerOnDot(xPercent, yPercent) {
-    if (zoomLevel < 2) zoomLevel = 2;
-    const dx = (xPercent / 100 - 0.5) * baseW;
-    const dy = (yPercent / 100 - 0.5) * baseH;
-    panX = -dx * zoomLevel;
-    panY = -dy * zoomLevel;
-    updateMapTransform();
-}
-
-function updateMapTransform() {
-    mapContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
-}
-
-const MIN_ZOOM = 0.6, MAX_ZOOM = 5;
-function zoomIn()  { zoomLevel = Math.min(zoomLevel + 0.4, MAX_ZOOM); updateMapTransform(); }
-function zoomOut() { zoomLevel = Math.max(zoomLevel - 0.4, MIN_ZOOM); updateMapTransform(); }
-function resetZoom() { zoomLevel = 1; panX = 0; panY = 0; updateMapTransform(); }
-
-function initDragAndZoom() {
-    let isDragging = false;
-    let startX = 0, startY = 0;
-    let initialPinchDistance = null;
-    let initialZoom = 1;
-
-    mapViewport.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        isDragging = true;
-        startX = e.clientX - panX;
-        startY = e.clientY - panY;
-    });
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        panX = e.clientX - startX;
-        panY = e.clientY - startY;
-        updateMapTransform();
-    });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    mapViewport.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-            isDragging = true;
-            startX = e.touches[0].clientX - panX;
-            startY = e.touches[0].clientY - panY;
-        } else if (e.touches.length === 2) {
-            isDragging = false;
-            initialPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            initialZoom = zoomLevel;
-        }
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1 && isDragging) {
-            panX = e.touches[0].clientX - startX;
-            panY = e.touches[0].clientY - startY;
-            updateMapTransform();
-        } else if (e.touches.length === 2 && initialPinchDistance) {
-            e.preventDefault();
-            const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            zoomLevel = Math.min(Math.max(initialZoom * (d / initialPinchDistance), MIN_ZOOM), MAX_ZOOM);
-            updateMapTransform();
-        }
-    }, { passive: false });
-
-    window.addEventListener('touchend', (e) => {
-        if (e.touches.length < 2) initialPinchDistance = null;
-        if (e.touches.length === 0) isDragging = false;
-    });
-
-    // เลื่อนล้อเมาส์เหนือแผนที่ = ซูมเข้า/ออก (เลื่อนล้อที่ส่วนอื่นของหน้า = เลื่อนหน้าเว็บตามปกติ)
-    mapViewport.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        zoomLevel = e.deltaY < 0 ? Math.min(zoomLevel + 0.2, MAX_ZOOM) : Math.max(zoomLevel - 0.2, MIN_ZOOM);
-        updateMapTransform();
-    }, { passive: false });
-}
-
-/* ---------------- GPS / ระยะทาง ---------------- */
-function initGpsFeature() {
-    if (!hasAnyCoords()) return;            // ยังไม่ได้ใส่พิกัด → ซ่อนฟีเจอร์ GPS
-    document.getElementById('gpsBtn').classList.remove('hidden');
-    document.getElementById('gpsBtn').classList.add('flex');
-    document.getElementById('optNearest').disabled = false;
-    document.getElementById('optNearest').hidden = false;
-    affine = buildAffine();
-}
-
-function toggleGPS() { gpsOn ? stopGPS() : startGPS(); }
-
-function startGPS() {
-    if (!hasAnyCoords()) return;
-    if (!navigator.geolocation) { showToast('อุปกรณ์นี้ไม่รองรับ GPS'); return; }
-    if (gpsOn) return;
-    gpsOn = true;
-    firstFix = true;
-    document.getElementById('gpsBtnText').textContent = 'กำลังหาตำแหน่ง...';
-    watchId = navigator.geolocation.watchPosition(onPosition, onPositionError, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
-}
-
-function stopGPS() {
-    if (watchId != null) navigator.geolocation.clearWatch(watchId);
-    watchId = null; gpsOn = false; userPos = null; userXY = null;
-    buildingData.forEach(b => b.distance = null);
-    if (sortMode === 'nearest') { sortMode = 'number'; document.getElementById('sortSelect').value = 'number'; }
-    document.getElementById('gpsBtnText').textContent = 'เปิดใช้งาน GPS';
-    document.getElementById('locateBtn').classList.add('hidden');
-    document.getElementById('legendUser').classList.add('hidden');
-    document.getElementById('legendUser').classList.remove('flex');
-    renderAll();
-}
-
-function onPosition(p) {
-    userPos = { lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy };
-    buildingData.forEach(b => {
-        b.distance = (b.lat != null && b.lng != null) ? haversine(userPos.lat, userPos.lng, b.lat, b.lng) : null;
-    });
-    userXY = affine ? affine(userPos.lat, userPos.lng) : null;
-
-    document.getElementById('gpsBtnText').textContent = 'GPS เปิดอยู่ (แตะเพื่อปิด)';
-    if (userXY) {
-        document.getElementById('locateBtn').classList.remove('hidden');
-        document.getElementById('legendUser').classList.remove('hidden');
-        document.getElementById('legendUser').classList.add('flex');
-    }
-    if (firstFix) {
-        firstFix = false;
-        sortMode = 'nearest';
-        document.getElementById('sortSelect').value = 'nearest';
-        showToast('อัปเดตพิกัดสำเร็จ — เรียงจุดที่ใกล้คุณที่สุดแล้ว');
-    }
-    renderAll();
-}
-
-function onPositionError(err) {
-    gpsOn = false;
-    watchId = null;
-    document.getElementById('gpsBtnText').textContent = 'เปิดใช้งาน GPS';
-    const msg = err.code === 1 ? 'ไม่ได้รับอนุญาตให้ใช้ตำแหน่ง — โปรดอนุญาตในเบราว์เซอร์'
-              : err.code === 2 ? 'ไม่สามารถระบุตำแหน่งได้ในขณะนี้'
-              : 'หาตำแหน่งนานเกินไป ลองใหม่อีกครั้ง';
-    showToast(msg);
-}
-
-function locateMe() {
-    if (userXY) centerOnDot(userXY[0], userXY[1]);
-    else startGPS();
-}
-
-function haversine(lat1, lon1, lat2, lon2) {
-    const R = 6371000, rad = Math.PI / 180;
-    const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
-    return 2 * R * Math.asin(Math.sqrt(a));
-}
-
-/* แปลงพิกัดโลก → ตำแหน่ง % บนรูปแผนที่ ด้วย affine transform (least squares) จากจุดที่มีพิกัด */
-function buildAffine() {
-    const pts = buildingData.filter(b => b.lat != null && b.lng != null);
-    if (pts.length < 3) return null;
-    const lat0 = pts.reduce((s, p) => s + p.lat, 0) / pts.length;
-    const lng0 = pts.reduce((s, p) => s + p.lng, 0) / pts.length;
-    const k = Math.cos(lat0 * Math.PI / 180);
-    const toXY = (lat, lng) => [(lng - lng0) * k * 111320, (lat - lat0) * 110540];
-
-    const AtA = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], Atx = [0, 0, 0], Aty = [0, 0, 0];
-    pts.forEach(p => {
-        const [X, Y] = toXY(p.lat, p.lng);
-        const r = [X, Y, 1];
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) AtA[i][j] += r[i] * r[j];
-            Atx[i] += r[i] * p.coords.x;
-            Aty[i] += r[i] * p.coords.y;
-        }
-    });
-    const cx = solve3(AtA, Atx), cy = solve3(AtA, Aty);
-    if (!cx || !cy) return null;
-    return (lat, lng) => {
-        const [X, Y] = toXY(lat, lng);
-        return [cx[0] * X + cx[1] * Y + cx[2], cy[0] * X + cy[1] * Y + cy[2]];
-    };
-}
-
-function solve3(A, b) {
-    const M = A.map((row, i) => [...row, b[i]]);
-    let maxAbs = 0;
-    A.forEach(r => r.forEach(v => { maxAbs = Math.max(maxAbs, Math.abs(v)); }));
-    for (let c = 0; c < 3; c++) {
-        let piv = c;
-        for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
-        if (Math.abs(M[piv][c]) < maxAbs * 1e-9) return null;   // จุดอยู่ในแนวเส้นตรงเดียวกัน / ข้อมูลไม่พอ
-        [M[c], M[piv]] = [M[piv], M[c]];
-        for (let r = c + 1; r < 3; r++) {
-            const f = M[r][c] / M[c][c];
-            for (let j = c; j < 4; j++) M[r][j] -= f * M[c][j];
-        }
-    }
-    const x = [0, 0, 0];
-    for (let i = 2; i >= 0; i--) {
-        let s = M[i][3];
-        for (let j = i + 1; j < 3; j++) s -= M[i][j] * x[j];
-        x[i] = s / M[i][i];
-    }
-    return x;
-}
-
-/* ---------------- Modal ---------------- */
-function openModal(id) {
-    const item = buildingData.find(b => b.id === id);
-    if (!item) return;
-
-    currentImageList = (item.images && item.images.length > 0)
-        ? item.images
-        : [`https://placehold.co/600x400/e2e8f0/475569?text=${encodeURIComponent(item.name)}`];
-    currentImageIndex = 0;
-    updateModalImage();
-
-    document.getElementById('modalCategory').textContent = item.category;
-    document.getElementById('modalTitle').textContent = item.name;
-    document.getElementById('modalNavBtn').href = navUrl(item);
-
-    const off = isOffline(item);
-    const statusBox = off
-        ? `<div class="mb-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-center gap-2">
-               <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
-               <div><strong>สถานะ:</strong> เครื่องทาบบัตรขัดข้อง / ไม่พร้อมใช้งาน</div>
-           </div>`
-        : `<div class="mb-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-800 text-xs flex items-center gap-2">
-               <i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>
-               <div><strong>สถานะ:</strong> ปกติ</div>
-           </div>`;
-    const distLine = item.distance != null
-        ? `<div class="mb-2 text-xs text-blue-600 font-medium"><i class="fa-solid fa-person-walking"></i> ห่างจากคุณประมาณ ${formatDistance(item.distance)}</div>` : '';
-
-    document.getElementById('modalDesc').innerHTML = statusBox + distLine + esc(item.desc || "ไม่มีรายละเอียดเพิ่มเติม");
-
-    detailModal.classList.remove('hidden');
-    setTimeout(() => {
-        detailModal.classList.remove('opacity-0');
-        modalCard.classList.remove('scale-95');
-        modalCard.classList.add('scale-100');
-    }, 10);
-}
-
-function closeModal() {
-    detailModal.classList.add('opacity-0');
-    modalCard.classList.remove('scale-100');
-    modalCard.classList.add('scale-95');
-    setTimeout(() => detailModal.classList.add('hidden'), 300);
-}
-detailModal.addEventListener('click', (e) => { if (e.target === detailModal) closeModal(); });
-
-function updateModalImage() {
-    const imgElem = document.getElementById('modalImage');
-    const counterElem = document.getElementById('imageCounter');
-    const prevBtn = document.getElementById('prevImgBtn');
-    const nextBtn = document.getElementById('nextImgBtn');
-
-    imgElem.src = currentImageList[currentImageIndex];
-    counterElem.textContent = `${currentImageIndex + 1}/${currentImageList.length}`;
-
-    const multi = currentImageList.length > 1;
-    prevBtn.style.display = multi ? 'flex' : 'none';
-    nextBtn.style.display = multi ? 'flex' : 'none';
-    counterElem.style.display = multi ? 'block' : 'none';
-}
-function nextImage(e) {
-    if (e) e.stopPropagation();
-    if (currentImageList.length <= 1) return;
-    currentImageIndex = (currentImageIndex + 1) % currentImageList.length;
-    updateModalImage();
-}
-function prevImage(e) {
-    if (e) e.stopPropagation();
-    if (currentImageList.length <= 1) return;
-    currentImageIndex = (currentImageIndex - 1 + currentImageList.length) % currentImageList.length;
-    updateModalImage();
-}
-
-/* ---------------- พื้นหลังเคลื่อนไหวตามการเลื่อนหน้า ---------------- */
-(function initBgParallax() {
-    const layers = Array.from(document.querySelectorAll('#bgFx [data-parallax]'));
-    if (!layers.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let cur = 0, running = false;
-
-    function progress() {
-        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-        return Math.min(1, Math.max(0, window.scrollY / max));
-    }
-    function frame() {
-        const target = progress();
-        cur += (target - cur) * 0.08;                       // หน่วงให้ลื่นๆ
-        const vh = window.innerHeight, vw = window.innerWidth;
-        layers.forEach((l, idx) => {
-            const s = parseFloat(l.dataset.parallax);
-            const ty = (0.5 - cur) * 0.30 * vh * s;
-            const tx = (cur - 0.5) * 0.06 * vw * s * (idx % 2 ? -1 : 1);
-            l.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0)`;
-        });
-        if (Math.abs(target - cur) > 0.0005) requestAnimationFrame(frame); else running = false;
-    }
-    function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
-    window.addEventListener('scroll', kick, { passive: true });
-    window.addEventListener('resize', kick);
-    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.body);
-    cur = progress(); kick();
-})();
-    </script>
 </body>
 </html>
