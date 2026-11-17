@@ -774,30 +774,69 @@
   align-items: center;
 }
 
-/* แถบเลื่อนแนวนอน */
+/* ==========================================
+   Infinite Draggable Service Slider
+   ========================================== */
+.service-slider-section {
+  max-width: 1200px;
+  margin: 24px auto 36px;
+  padding: 0 20px;
+  position: relative;
+}
+
+.service-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.service-slider-header h2 {
+  margin: 0;
+  color: #0f5132;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.service-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .service-track {
   display: flex;
   gap: 18px;
   overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
   padding: 12px 6px 20px;
   width: 100%;
-  scrollbar-width: none; /* ซ่อน Scrollbar บน Firefox */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  scrollbar-width: none;
 }
 
 .service-track::-webkit-scrollbar {
-  display: none; /* ซ่อน Scrollbar บน Chrome / Safari */
+  display: none;
+}
+
+.service-track.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto !important;
 }
 
 .service-track > a {
-  flex: 0 0 220px; /* ล็อคความกว้างการ์ดแต่ละใบ (เห็นประมาณ 4-5 ใบพร้อมกันบนจอคอม) */
-  scroll-snap-align: start;
+  flex: 0 0 220px;
   text-decoration: none !important;
   color: inherit;
+  -webkit-user-drag: none; /* ป้องกันเบราว์เซอร์ลากตัวลิงก์แทนการสไลด์ */
 }
 
-/* การ์ดทรงเดิมของคุณ */
+.service-track img {
+  pointer-events: none; /* ป้องกันรูปภาพถูกลากติดเมาส์ */
+  -webkit-user-drag: none;
+}
+
 .service-track .image-card {
   background-color: #ffffff;
   border: 1px solid #e5ebe7;
@@ -805,7 +844,6 @@
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  cursor: pointer;
   height: 270px;
   display: flex;
   flex-direction: column;
@@ -848,6 +886,46 @@
   font-weight: 500;
   color: #333333;
   line-height: 1.35;
+}
+
+/* ปุ่มลูกศร ซ้าย - ขวา */
+.service-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #dce5df;
+  color: #0f5132;
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.service-nav-btn:hover {
+  background: #0f5132;
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.service-nav-btn.prev { left: -14px; }
+.service-nav-btn.next { right: -14px; }
+
+@media (max-width: 768px) {
+  .service-slider-section { padding: 0 12px; }
+  .service-track > a { flex: 0 0 190px; }
+  .service-track .image-card { height: 245px; }
+  .service-nav-btn { width: 36px; height: 36px; font-size: 1rem; }
+  .service-nav-btn.prev { left: -6px; }
+  .service-nav-btn.next { right: -6px; }
 }
 
 /* ปุ่มลูกศรกลม ซ้าย - ขวา เหมือน PEA Fund+ */
@@ -1233,15 +1311,108 @@
 
     startAutoSlide();
 
-    function scrollServiceTrack(direction) {
-  const track = document.getElementById('serviceTrack');
-  if (!track) return;
-  const scrollAmount = 460; // ระยะเลื่อนต่อการกด 1 ครั้ง (ประมาณ 2 การ์ด)
-  track.scrollBy({
-    left: direction * scrollAmount,
-    behavior: 'smooth'
-  });
-}
+    document.addEventListener('DOMContentLoaded', function () {
+        const track = document.getElementById('serviceTrack');
+        if (!track) return;
+      
+        // 1. สร้างชุดการ์ดสำเนาต่อหัว-ท้าย เพื่อให้วนลูปได้ไม่สิ้นสุด
+        const originalCards = Array.from(track.children);
+        originalCards.forEach(card => {
+          const cloneEnd = card.cloneNode(true);
+          cloneEnd.setAttribute('aria-hidden', 'true');
+          track.appendChild(cloneEnd);
+        });
+        originalCards.slice().reverse().forEach(card => {
+          const cloneStart = card.cloneNode(true);
+          cloneStart.setAttribute('aria-hidden', 'true');
+          track.insertBefore(cloneStart, track.firstChild);
+        });
+      
+        // คำนวณความกว้าง 1 รอบของชุดการ์ด
+        function getSetWidth() {
+          const firstOriginal = originalCards[0];
+          const gap = parseFloat(getComputedStyle(track).gap) || 18;
+          return (firstOriginal.offsetWidth + gap) * originalCards.length;
+        }
+      
+        // ตั้งตำแหน่งเริ่มต้นไว้ที่ชุดการ์ดจริงตรงกลาง
+        let setWidth = getSetWidth();
+        track.scrollLeft = setWidth;
+      
+        window.addEventListener('resize', () => {
+          setWidth = getSetWidth();
+        });
+      
+        // 2. ตรวจจับตำแหน่งเพื่อรีเซ็ตจุดวนลูปแบบไร้รอยต่อ
+        function handleInfiniteLoop() {
+          if (track.scrollLeft <= 10) {
+            track.scrollLeft += setWidth;
+          } else if (track.scrollLeft >= setWidth * 2 - 10) {
+            track.scrollLeft -= setWidth;
+          }
+        }
+        track.addEventListener('scroll', handleInfiniteLoop);
+      
+        // 3. ระบบคลิกเมาส์ค้างแล้วลาก (Mouse Drag)
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+        let hasDragged = false;
+      
+        track.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return; // รับเฉพาะคลิกซ้าย
+          isDown = true;
+          hasDragged = false;
+          track.classList.add('is-dragging');
+          startX = e.pageX - track.offsetLeft;
+          scrollStart = track.scrollLeft;
+        });
+      
+        window.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          const x = e.pageX - track.offsetLeft;
+          const walk = (x - startX) * 1.3; // ความเร็วในการลาก
+          if (Math.abs(walk) > 6) {
+            hasDragged = true; // ถือว่าเป็นการลาก ไม่ใช่การคลิกเปิดหน้า
+          }
+          track.scrollLeft = scrollStart - walk;
+          handleInfiniteLoop();
+        });
+      
+        window.addEventListener('mouseup', () => {
+          if (!isDown) return;
+          isDown = false;
+          track.classList.remove('is-dragging');
+        });
+      
+        // ป้องกันไม่ให้เปิดลิงก์เมื่อผู้ใช้ตั้งใจลากเมาส์เลื่อนการ์ด
+        track.addEventListener('click', (e) => {
+          if (hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            hasDragged = false;
+          }
+        }, true);
+      
+        // 4. ฟังก์ชันสำหรับปุ่มกดลูกศร ซ้าย - ขวา
+        window.scrollServiceTrack = function (direction) {
+          const firstOriginal = originalCards[0];
+          const gap = parseFloat(getComputedStyle(track).gap) || 18;
+          const step = (firstOriginal.offsetWidth + gap) * 2; // เลื่อนทีละ 2 การ์ด
+      
+          // เผื่อพื้นที่ก่อนเลื่อนกรณีอยู่ใกล้ขอบวนลูป
+          if (direction < 0 && track.scrollLeft - step < 20) {
+            track.scrollLeft += setWidth;
+          } else if (direction > 0 && track.scrollLeft + step > setWidth * 2 - 20) {
+            track.scrollLeft -= setWidth;
+          }
+      
+          track.scrollBy({
+            left: direction * step,
+            behavior: 'smooth'
+          });
+        };
+      });
     
   </script>
 
