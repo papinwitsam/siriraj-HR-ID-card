@@ -101,33 +101,7 @@
             background-color: #f3f6f7;
             /* background-image: url('ใส่ลิงก์รูปพื้นหลังตรงนี้'); */
             /* background-size: cover; background-position: center; background-attachment: fixed; */
-        }
-
-            /* Navbar */
-    .navbar { background-color: #ffffff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000; height: 64px; }
-    .navbar-container { height: 64px; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
-    .brand-logo { display: flex; align-items: center; flex-shrink: 0; }
-    .brand-logo img { display: block; width: auto; height: 60px; max-width: min(48vw, 220px); object-fit: contain; }
-    .nav-menu { display: flex; list-style: none; gap: 25px; align-items: center; margin: 0; padding: 0; }
-    .nav-item .nav-link { color: #333; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
-    .nav-item .nav-link:hover { color: #094824; }
-    .menu-toggle { display: none; }
-    .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
-    .hamburger span { width: 25px; height: 3px; background-color: #333; border-radius: 2px; transition: all 0.3s ease; }
-
-    @media (max-width: 768px) {
-      .hamburger { display: flex; }
-      .nav-menu {
-        position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff;
-        flex-direction: column; align-items: center; padding: 20px 0; gap: 20px;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); display: none;
-      }
-      .menu-toggle:checked ~ .nav-menu { display: flex; }
-      .menu-toggle:checked ~ .hamburger span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
-      .menu-toggle:checked ~ .hamburger span:nth-child(2) { opacity: 0; }
-      .menu-toggle:checked ~ .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
-    }
-        
+        }        
     </style>
 </head>
 <body class="font-sans text-slate-800" style="min-height:100vh;min-height:100dvh;">
@@ -167,22 +141,6 @@
         </div>
     </div>
 
-      <nav class="navbar" aria-label="เมนูหลัก">
-    <div class="navbar-container">
-      <a href="index.html" class="brand-logo" aria-label="Si_HR ID card หน้าแรก">
-        <img src="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw" alt="Si_HR ID card">
-      </a>
-      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="เปิดหรือปิดเมนู">
-      <label for="menu-toggle" class="hamburger" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </label>
-      <ul class="nav-menu">
-        <li class="nav-item"><a href="index.html" class="nav-link">หน้าแรก</a></li>
-        <li class="nav-item"><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
-      </ul>
-    </div>
-  </nav>
-
     <!-- Header -->
     <header class="sticky top-0 w-full bg-white border-b border-slate-200 px-3 py-2 md:px-6 flex-none flex items-center justify-between shadow-sm z-30 min-h-[52px]">
         <div class="flex items-center gap-2.5 min-w-0">
@@ -194,6 +152,11 @@
                 <p class="text-[10px] md:text-xs text-slate-500 leading-none hidden sm:block">โรงพยาบาลศิริราช</p>
             </div>
         </div>
+        <a href="index.html" rel="noopener noreferrer"
+           class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap flex-none ml-2">
+            <span>หน้าแรก</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
         <a href="https://script.google.com/a/macros/mahidol.ac.th/s/AKfycbxuYeQPDYXIbxB6ROxBqL5co1UIuEZ9-amtrfliqVVP99YvoS6bTbf8n7tzc4YjAnLv/exec" target="_blank" rel="noopener noreferrer"
            class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition-all active:scale-95 whitespace-nowrap flex-none ml-2">
             <span>สถานะเครื่อง</span>
