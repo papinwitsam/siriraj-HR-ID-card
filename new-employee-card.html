@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ขั้นตอนการทำบัตรพนักงานบรรจุใหม่ - Si_HR ID card</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      margin: 0; display: flex; flex-direction: column; min-height: 100vh;
+      overflow-x: hidden; background: #f4f6f9; color: #26372e;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px;
+    }
+    a { text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* Navbar */
+    .navbar { background-color: #ffffff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000; height: 64px; }
+    .navbar-container { height: 64px; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+    .brand-logo { display: flex; align-items: center; flex-shrink: 0; }
+    .brand-logo img { display: block; width: auto; height: 60px; max-width: min(48vw, 220px); object-fit: contain; }
+    .nav-menu { display: flex; list-style: none; gap: 25px; align-items: center; margin: 0; padding: 0; }
+    .nav-item .nav-link { color: #333; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+    .nav-item .nav-link:hover { color: #094824; }
+    .menu-toggle { display: none; }
+    .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+    .hamburger span { width: 25px; height: 3px; background-color: #333; border-radius: 2px; transition: all 0.3s ease; }
+
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .nav-menu {
+        position: absolute; top: 100%; left: 0; width: 100%; background-color: #ffffff;
+        flex-direction: column; align-items: center; padding: 20px 0; gap: 20px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); display: none;
+      }
+      .menu-toggle:checked ~ .nav-menu { display: flex; }
+      .menu-toggle:checked ~ .hamburger span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+      .menu-toggle:checked ~ .hamburger span:nth-child(2) { opacity: 0; }
+      .menu-toggle:checked ~ .hamburger span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+    }
+
+    /* Main Content */
+    .new-card-guide {
+      width: min(100% - 32px, 960px); margin: 32px auto; padding: 32px;
+      color: #26372e; background: #ffffff; border: 1px solid #e3ebe5;
+      border-radius: 18px; box-shadow: 0 6px 22px rgba(15, 81, 50, 0.07);
+    }
+    .new-card-guide__header { margin-bottom: 26px; padding-bottom: 20px; border-bottom: 1px solid #e7eee9; }
+    .new-card-guide__eyebrow, .photo-guide__eyebrow {
+      display: inline-block; margin-bottom: 7px; color: #0f7a4b;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em;
+    }
+    .new-card-guide__header h1 { margin: 0 0 8px; color: #0f5132; font-size: clamp(1.4rem, 3vw, 1.85rem); line-height: 1.4; }
+    .new-card-guide__header p { margin: 0; color: #647067; line-height: 1.6; }
+
+    .new-card-steps { margin: 0; padding: 0; list-style: none; }
+    .new-card-step { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; padding-bottom: 22px; }
+    .new-card-step:last-child { padding-bottom: 0; }
+    .new-card-step:not(:last-child)::after { position: absolute; top: 46px; bottom: 3px; left: 22px; width: 2px; background: #dce9e0; content: ""; }
+    .new-card-step__number {
+      position: relative; z-index: 1; display: flex; width: 46px; height: 46px;
+      align-items: center; justify-content: center; border: 3px solid #e5f1e9;
+      border-radius: 50%; background: #0f5132; color: #ffffff; font-size: 0.84rem; font-weight: 700;
+    }
+    .new-card-step__body { padding-top: 3px; }
+    .new-card-step__body h2 { margin: 0 0 5px; color: #26372e; font-size: 1.05rem; font-weight: 700; }
+    .new-card-step__body p { margin: 0; color: #59665e; font-size: 0.96rem; line-height: 1.7; }
+
+    .photo-guide {
+      margin: 30px 0 0 64px; padding: 22px; text-align: center;
+      background: #f7faf8; border: 1px solid #e5ebe7; border-radius: 14px;
+    }
+    .photo-guide__caption h2 { margin: 0 0 7px; color: #0f5132; font-size: 1.2rem; }
+    .photo-guide__caption p { margin: 0 0 18px; color: #647067; line-height: 1.6; }
+    .photo-guide__image-link { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; max-width: 100%; color: #0f5132; font-size: 0.9rem; }
+    .photo-guide__image-link img { display: block; width: min(100%, 560px); height: auto; border: 1px solid #e0e7e2; border-radius: 10px; }
+    .photo-guide__image-link:hover span { text-decoration: underline; }
+
+    /* Footer */
+    .footer { background-color: #094824; color: #a3d9ba; padding: 40px 0 20px 0; margin-top: auto; font-size: 16px; line-height: 1.8; }
+    .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
+    .footer-about h3, .footer-links h4 { color: #ffffff; font-size: 16px; margin-bottom: 15px; }
+    .footer-about p { line-height: 1.4; font-size: 14px; color: #a3d9ba; }
+    .footer-about p:last-child { margin-bottom: 0; }
+    .footer-links ul { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a { color: #ffffff; display: inline-block; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s ease; }
+    .footer-links a:hover { transform: translateX(8px); }
+    .footer-links a::before { content: "— "; opacity: 0; margin-right: -12px; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+    .footer-links a:hover::before { opacity: 1; margin-right: 6px; }
+    .qr-image-box { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px dashed #cbd5e1; display: inline-block; }
+    .qr-image-box img { width: 140px; height: 140px; object-fit: contain; display: block; border-radius: 6px; }
+    .footer-bottom { max-width: 1200px; margin: 30px auto 0 auto; padding: 20px 20px 0 20px; border-top: 1px solid #a3d9ba; text-align: center; color: #8ebdaa; font-size: 16px; }
+
+    @media (max-width: 992px) {
+      html, body { font-size: 20px; line-height: 1.65; }
+      .navbar, .navbar-container { height: 80px; min-height: 80px; }
+      .brand-logo img { height: 58px; max-width: 55vw; }
+      .nav-item .nav-link { font-size: 1.15rem; }
+      .new-card-guide__header h1 { font-size: 1.7rem; }
+      .new-card-guide__header p, .new-card-step__body p, .photo-guide__caption p { font-size: 1.08rem; line-height: 1.7; }
+      .new-card-step__body h2 { font-size: 1.22rem; }
+      .new-card-step__number { width: 50px; height: 50px; font-size: 1rem; }
+      .footer { padding: 42px 0 26px; font-size: 1.05rem; }
+      .footer-container { grid-template-columns: 1fr; gap: 30px; }
+      .footer-about h3, .footer-links h4 { font-size: 1.3rem; }
+      .footer-about p, .footer-links a { font-size: 1.05rem; }
+      .qr-image-box img { width: 180px; height: 180px; }
+    }
+
+    @media (max-width: 600px) {
+      .new-card-guide { width: calc(100% - 24px); margin: 20px auto; padding: 22px 18px; border-radius: 14px; }
+      .new-card-step { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding-bottom: 20px; }
+      .new-card-step__number { width: 40px; height: 40px; }
+      .new-card-step:not(:last-child)::after { top: 40px; left: 19px; }
+      .photo-guide { margin: 24px 0 0; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar" aria-label="เมนูหลัก">
+    <div class="navbar-container">
+      <a href="index.html" class="brand-logo" aria-label="Si_HR ID card หน้าแรก">
+        <img src="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw" alt="Si_HR ID card">
+      </a>
+      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="เปิดหรือปิดเมนู">
+      <label for="menu-toggle" class="hamburger" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </label>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">หน้าแรก</a></li>
+        <li class="nav-item"><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="new-card-guide">
+    <header class="new-card-guide__header">
+      <span class="new-card-guide__eyebrow">EMPLOYEE ID CARD</span>
+      <h1>ขั้นตอนการทำบัตรพนักงานบรรจุใหม่</h1>
+      <p>เตรียมข้อมูลและเอกสารให้พร้อม เพื่อช่วยให้การทำบัตรเป็นไปอย่างรวดเร็ว</p>
+    </header>
+
+    <ol class="new-card-steps">
+      <li class="new-card-step">
+        <span class="new-card-step__number">01</span>
+        <div class="new-card-step__body">
+          <h2>เตรียมเอกสารแสดงสังกัด</h2>
+          <p>เตรียมเอกสาร <strong>คำสั่งบรรจุแต่งตั้ง</strong> หรือเอกสารที่แสดงสังกัดหน่วยงานระดับฝ่ายหรือภาควิชา</p>
+        </div>
+      </li>
+
+      <li class="new-card-step">
+        <span class="new-card-step__number">02</span>
+        <div class="new-card-step__body">
+          <h2>แจ้งเลข ID SAP หากมี</h2>
+          <p>เพื่อความสะดวกรวดเร็วในการตรวจสอบ กรุณาแจ้งเลข <strong>ID SAP</strong> เช่น <strong>100xxxxx</strong></p>
+        </div>
+      </li>
+
+      <li class="new-card-step">
+        <span class="new-card-step__number">03</span>
+        <div class="new-card-step__body">
+          <h2>เตรียมรูปถ่ายหน้าตรง</h2>
+          <p>หากมีรูปถ่ายหน้าตรงเป็นไฟล์ดิจิทัล สามารถส่งไฟล์ให้เจ้าหน้าที่ผ่านทาง Line OA ได้ หากไม่มี <strong>สามารถถ่ายรูปได้ที่ห้องทำบัตร</strong></p>
+        </div>
+      </li>
+
+      <li class="new-card-step">
+        <span class="new-card-step__number">04</span>
+        <div class="new-card-step__body">
+          <h2>รอรับบัตร</h2>
+          <p>กรณีส่งรูปถ่ายมาให้เจ้าหน้าที่ เมื่อบัตรทำเสร็จเรียบร้อย เจ้าหน้าที่จะแจ้งให้มารับบัตร ผ่านทาง Line OA</p>
+        </div>
+      </li>
+    </ol>
+
+    <figure class="photo-guide">
+      <figcaption class="photo-guide__caption">
+        <h2>ตัวอย่างไฟล์รูปถ่ายที่แนะนำ</h2>
+        <p>ควรส่งไฟล์รูปถ่ายดิจิทัลต้นฉบับ เพื่อให้ได้ภาพที่คมชัดและรายละเอียดครบถ้วน</p>
+      </figcaption>
+
+      <a class="photo-guide__image-link" href="https://lh3.googleusercontent.com/d/1ZBq1u4EOZTmpwYkqCQ53QZjcpOiAJEGa" target="_blank" rel="noopener noreferrer">
+        <img src="https://lh3.googleusercontent.com/d/1ZBq1u4EOZTmpwYkqCQ53QZjcpOiAJEGa" alt="เปรียบเทียบไฟล์รูปถ่ายดิจิทัลต้นฉบับกับรูปถ่ายจากภาพพิมพ์" loading="lazy">
+        <span>คลิกเพื่อดูภาพขนาดเต็ม</span>
+      </a>
+    </figure>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-about" id="contact">
+        <h3>ติดต่อห้องทำบัตร</h3>
+        <p>ตึกท่านผู้หญิงวิจิตรา</p>
+        <p>โทรศัพท์: 0-2419-7180</p>
+        <p>วันที่ให้บริการ: จันทร์ | พุธ | ศุกร์</p>
+        <p>เวลาทำการ: 08:30–16:30 น. (พักเที่ยง)</p>
+        <p>Email: papinwit.sam@mahidol.ac.th</p>
+      </div>
+      <nav class="footer-links" aria-label="เมนูด่วน">
+        <h4>เมนูด่วน</h4>
+        <ul>
+          <li><a href="damaged-card.html">บัตรพนักงานชำรุด</a></li>
+          <li><a href="lost-card.html">บัตรพนักงานหาย</a></li>
+          <li><a href="new-employee-card.html">ทำบัตรพนักงานบรรจุใหม่</a></li>
+          <li><a href="time-recording-guide.html">ขั้นตอนการบันทึกเวลา</a></li>
+          <li><a href="internet-guide.html">สมัครใช้งาน Internet</a></li>
+        </ul>
+      </nav>
+      <div class="footer-links">
+        <h4>LINE: Si_HR ID Card</h4>
+        <div class="qr-image-box">
+          <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code สำหรับ LINE Si_HR ID Card" loading="lazy">
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Website: Si_HR ID card<br>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล มหาวิทยาลัยมหิดล</p>
+    </div>
+  </footer>
+
+</body>
+</html>
