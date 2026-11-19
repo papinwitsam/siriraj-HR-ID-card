@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <p>ตึกท่านผู้หญิงวิจิตรา | จันทร์ , พุธ , ศุกร์ | เวลา 08:30 - 16:30 น. | โทร. 02-419-7180</p>
         </div>
         <div class="footer-copy">
-          &copy; ${new Date().getFullYear()} ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
+        ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
         </div>
       </div>
     </footer>
