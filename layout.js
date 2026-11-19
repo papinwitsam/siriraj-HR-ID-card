@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. กำหนดโครงสร้าง Navbar
+  // 1. กำหนดโครงสร้าง Navbar <img src="favicon.png" alt="โลโก้ศิริราช" class="site-brand-logo">
   const navbarHTML = `
     <header class="site-navbar">
       <div class="site-navbar-inner">
         <a href="index.html" class="site-brand">
-          <img src="favicon.png" alt="โลโก้ศิริราช" class="site-brand-logo">
+
           <div class="site-brand-text">
             <strong>Si_HR ID card</strong>
             <span>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</span>
