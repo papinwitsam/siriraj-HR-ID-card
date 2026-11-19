@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. กำหนดโครงสร้าง Navbar
+  // 1. ส่วน Navbar
   const navbarHTML = `
     <header class="site-navbar">
       <div class="site-navbar-inner">
@@ -21,22 +21,37 @@ document.addEventListener('DOMContentLoaded', function () {
     </header>
   `;
 
-  // 2. กำหนดโครงสร้าง Footer
+  // 2. ส่วน Footer (คงคลาสและข้อมูลเดิมของคุณ แต่ตัดส่วน "ติดต่อห้องทำบัตร" ออก)
   const footerHTML = `
-    <footer class="site-footer">
-      <div class="site-footer-inner">
-        <div class="footer-info">
-          <strong>งานบริหารทรัพยากรบุคคล (ห้องทำบัตรพนักงาน)</strong>
-          <p>ตึกอำนวยการ ชั้น 1 โรงพยาบาลศิริราช | โทร. 02-419-XXXX (ภายใน XXXX)</p>
+    <footer class="footer">
+      <div class="footer-container">
+        <nav class="footer-links" aria-label="เมนูด่วน">
+          <h4>เมนูด่วน</h4>
+          <ul>
+            <li><a href="damaged-card.html">บัตรพนักงานชำรุด</a></li>
+            <li><a href="lost-card.html">บัตรพนักงานหาย</a></li>
+            <li><a href="new-employee-card.html">ทำบัตรพนักงานบรรจุใหม่</a></li>
+            <li><a href="time-recording-guide.html">ขั้นตอนการบันทึกเวลา</a></li>
+            <li><a href="half-day-leave.html">การลงเวลา กรณีลาครึ่งวัน</a></li>
+            <li><a href="internet-guide.html">สมัครใช้งาน Internet</a></li>
+          </ul>
+        </nav>
+
+        <div class="footer-links">
+          <h4>LINE: Si_HR ID Card</h4>
+          <div class="qr-image-box">
+            <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code สำหรับ LINE Si_HR ID Card" loading="lazy">
+          </div>
         </div>
-        <div class="footer-copy">
-          &copy; ${new Date().getFullYear()} ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
-        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>Website: Si_HR ID card<br>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล มหาวิทยาลัยมหิดล</p>
       </div>
     </footer>
   `;
 
-  // 3. นำ Navbar และ Footer ไปวางในตำแหน่งที่กำหนดไว้ในแต่ละหน้า
+  // 3. แทรก Navbar และ Footer ลงในหน้าเว็บ
   const headerPlaceholder = document.getElementById('navbar-placeholder');
   if (headerPlaceholder) {
     headerPlaceholder.innerHTML = navbarHTML;
@@ -47,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
     footerPlaceholder.innerHTML = footerHTML;
   }
 
-  // 4. ไฮไลต์ปุ่มเมนูของหน้าที่กำลังเปิดอยู่ให้อัตโนมัติ (Active State)
+  // 4. ไฮไลต์ปุ่มเมนูของหน้าที่กำลังเปิดอยู่ให้อัตโนมัติ
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.site-nav-actions a').forEach(link => {
     if (link.getAttribute('href') === currentPage) {
