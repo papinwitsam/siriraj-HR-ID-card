@@ -169,3 +169,35 @@
   font-weight: 700;
   letter-spacing: 0.04em;
 }
+
+/* ป้ายตัวนับผู้เข้าชมใน .site-footer */
+.footer-copy {
+  text-align: right;
+}
+
+.visitor-counter-wrap {
+  margin-top: 6px;
+}
+
+.visitor-counter-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2f1e8;
+  font-size: 0.78rem;
+}
+
+.visitor-number {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .footer-copy {
+    text-align: left;
+  }
+}
