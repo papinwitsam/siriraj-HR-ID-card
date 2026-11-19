@@ -14,7 +14,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- 1. เรียกใช้ไฟล์ CSS กลาง -->
+  <link rel="stylesheet" href="style.css">
 
+  
   <style>
     /* Base Styles */
     *, *::before, *::after { box-sizing: border-box; }
@@ -537,24 +540,8 @@
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="navbar" aria-label="เมนูหลัก">
-    <div class="navbar-container">
-      <a href="index.html" class="brand-logo" aria-label="Si_HR ID card หน้าแรก">
-        <img src="https://lh3.googleusercontent.com/d/1N0Srr3clRVZb4q0xxXGf65a9Et0MfInw" alt="Si_HR ID card">
-      </a>
-
-      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="เปิดหรือปิดเมนู">
-      <label for="menu-toggle" class="hamburger" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </label>
-
-      <ul class="nav-menu">
-        <li class="nav-item"><a href="index.html" class="nav-link">หน้าแรก</a></li>
-        <li class="nav-item"><a href="#contact" class="nav-link">ติดต่อเรา</a></li>
-      </ul>
-    </div>
-  </nav>
+  <!-- 2. จุดวาง Navbar อัตโนมัติ -->
+  <div id="navbar-placeholder"></div>
 
   <!-- Main Content -->
   <main class="halfday-page">
