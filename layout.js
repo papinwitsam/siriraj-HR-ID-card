@@ -28,14 +28,14 @@ document.addEventListener('DOMContentLoaded', function () {
           <strong>Website : Si_HR ID card (ห้องทำบัตรพนักงาน)</strong>
           <p>ตึกท่านผู้หญิงวิจิตรา | จันทร์ , พุธ , ศุกร์ | เวลา 08:30 - 16:30 น. | โทร. 02-419-7180</p>
         </div>
-        <div class="footer-copy">
+        <!--<div class="footer-copy">
           <div>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</div>
           <div class="visitor-counter-wrap">
             <span class="visitor-counter-box">
               ผู้เข้าชมเว็บไซต์: <strong id="visitorCount" class="visitor-number">...</strong> ครั้ง
             </span>
           </div>
-        </div>
+        </div>-->
       </div>
     </footer>
   `;
