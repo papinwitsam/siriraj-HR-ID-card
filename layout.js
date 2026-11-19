@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
     <footer class="site-footer">
       <div class="site-footer-inner">
         <div class="footer-info">
-          <strong>งานบริหารทรัพยากรบุคคล (ห้องทำบัตรพนักงาน)</strong>
-          <p>ตึกอำนวยการ ชั้น 1 โรงพยาบาลศิริราช | โทร. 02-419-XXXX (ภายใน XXXX)</p>
+          <strong>Website : Si_HR ID card (ห้องทำบัตรพนักงาน)</strong>
+          <p>ตึกท่านผู้หญิงวิจิตรา | จันทร์ , พุธ , ศุกร์ | เวลา 08:30 - 16:30 น. | โทร. 02-419-7180</p>
         </div>
         <div class="footer-copy">
           &copy; ${new Date().getFullYear()} ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
