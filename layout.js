@@ -1,57 +1,71 @@
-document.addEventListener('DOMContentLoaded', function () {
-  // 1. กำหนดโครงสร้าง Navbar
-  const navbarHTML = `
-    <header class="site-navbar">
-      <div class="site-navbar-inner">
-        <a href="index.html" class="site-brand">
-          <img src="favicon.png" alt="โลโก้ศิริราช" class="site-brand-logo">
-          <div class="site-brand-text">
+// ใน layout.js
+const footerHTML = `
+  <footer class="si-footer">
+    <div class="si-footer-container">
+      <!-- คอลัมน์ 1: หน่วยงาน & ที่ตั้ง -->
+      <div class="si-footer-col si-footer-brand">
+        <div class="si-footer-logo">
+          <img src="favicon.png" alt="Si_HR ID card">
+          <div>
             <strong>Si_HR ID card</strong>
             <span>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</span>
           </div>
+        </div>
+        <p class="si-footer-address">
+          <i class="fa-solid fa-location-dot"></i> ตึกท่านผู้หญิงวิจิตรา โรงพยาบาลศิริราช
+        </p>
+        <a href="https://forms.gle/JvUvBWacMSyfYq31A" target="_blank" rel="noopener noreferrer" class="si-feedback-btn">
+          <i class="fa-regular fa-comment-dots"></i> แบบฟอร์มคำแนะนำ / ติชม
         </a>
-
-        <nav class="site-nav-actions" aria-label="เมนูหลัก">
-          <a href="index.html" class="nav-btn">หน้าแรก</a>
-          <a href="new-employee-card.html" class="nav-btn">พนักงานบรรจุใหม่</a>
-          <a href="half-day-leave.html" class="nav-btn">การลงเวลา ลาครึ่งวัน</a>
-          <a href="internet-guide.html" class="nav-btn nav-btn-outline">ขั้นตอนการเข้าอินเทอร์เน็ต</a>
-        </nav>
       </div>
-    </header>
-  `;
 
-  // 2. กำหนดโครงสร้าง Footer
-  const footerHTML = `
-    <footer class="site-footer">
-      <div class="site-footer-inner">
-        <div class="footer-info">
-          <strong>Website : Si_HR ID card (ห้องทำบัตรพนักงาน)</strong>
-          <p>ตึกท่านผู้หญิงวิจิตรา ประตู 9 โรงพยาบาลศิริราช | 08:30 - 16:30 น. | โทร. 02-419-7180</p>
+      <!-- คอลัมน์ 2: ช่องทางการติดต่อ & เวลาทำการ -->
+      <div class="si-footer-col">
+        <h4>ช่องทางการติดต่อ</h4>
+        <ul class="si-contact-list">
+          <li>
+            <span class="label">วันให้บริการ</span>
+            <span class="value">จันทร์ | พุธ | ศุกร์</span>
+          </li>
+          <li>
+            <span class="label">เวลาทำการ</span>
+            <span class="value">08:30 – 16:30 น. (พักเที่ยง)</span>
+          </li>
+          <li>
+            <span class="label">โทรศัพท์</span>
+            <a href="tel:024197180" class="value link">0-2419-7180</a>
+          </li>
+          <li>
+            <span class="label">อีเมล</span>
+            <a href="mailto:papinwit.sam@mahidol.ac.th" class="value link">papinwit.sam@mahidol.ac.th</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- คอลัมน์ 3: เมนูด่วน & LINE QR -->
+      <div class="si-footer-col si-footer-links-wrap">
+        <div>
+          <h4>เมนูด่วน</h4>
+          <ul class="si-quick-links">
+            <li><a href="damaged-card.html">บัตรพนักงานชำรุด</a></li>
+            <li><a href="lost-card.html">บัตรพนักงานหาย</a></li>
+            <li><a href="new-employee-card.html">ทำบัตรพนักงานบรรจุใหม่</a></li>
+            <li><a href="time-recording-guide.html">ขั้นตอนการบันทึกเวลา</a></li>
+            <li><a href="half-day-leave.html">การลงเวลา ลาครึ่งวัน</a></li>
+            <li><a href="internet-guide.html">สมัครใช้งาน Internet</a></li>
+            <li><a href="Card-Map.html">แผนที่จุดทาบบัตร</a></li>
+          </ul>
         </div>
-        <div class="footer-copy">
-          &copy; ${new Date().getFullYear()} ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
+
+        <div class="si-qr-card">
+          <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code LINE Si_HR ID Card" loading="lazy">
+          <span>LINE: Si_HR ID Card</span>
         </div>
       </div>
-    </footer>
-  `;
+    </div>
 
-  // 3. นำ Navbar และ Footer ไปวางในตำแหน่งที่กำหนดไว้ในแต่ละหน้า
-  const headerPlaceholder = document.getElementById('navbar-placeholder');
-  if (headerPlaceholder) {
-    headerPlaceholder.innerHTML = navbarHTML;
-  }
-
-  const footerPlaceholder = document.getElementById('footer-placeholder');
-  if (footerPlaceholder) {
-    footerPlaceholder.innerHTML = footerHTML;
-  }
-
-  // 4. ไฮไลต์ปุ่มเมนูของหน้าที่กำลังเปิดอยู่ให้อัตโนมัติ (Active State)
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.site-nav-actions a').forEach(link => {
-    if (link.getAttribute('href') === currentPage) {
-      link.classList.add('is-active');
-    }
-  });
-});
+    <div class="si-footer-bottom">
+      <p>© ${new Date().getFullYear()} Si_HR ID card — ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล มหาวิทยาลัยมหิดล</p>
+    </div>
+  </footer>
+`;
