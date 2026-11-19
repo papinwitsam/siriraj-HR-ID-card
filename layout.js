@@ -70,17 +70,22 @@ function updateVisitorCounter() {
   const namespace = 'siriraj-hr-id-card-papinwit';
   const key = 'total-visits';
 
-  // นับ 1 ครั้งต่อ 1 รอบการเปิดเบราว์เซอร์ (กันเลขเบิ้ลเวลาเปลี่ยนหน้าหรือกด F5)
+  // นับเพิ่ม 1 ครั้งต่อ 1 รอบการเปิดเบราว์เซอร์ (กันเลขเบิ้ลเวลาเปลี่ยนหน้าหรือกด F5)
   const hasCounted = sessionStorage.getItem('si_hr_counted');
   const endpoint = hasCounted
-    ? `https://api.counterapi.dev/v1/${namespace}/${key}/`
-    : `https://api.counterapi.dev/v1/${namespace}/${key}/up`;
+    ? `https://counterapi.com/api/${namespace}/view/${key}`
+    : `https://counterapi.com/api/${namespace}/visit/${key}`;
 
   fetch(endpoint)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error('Network response was not ok');
+      return res.json();
+    })
     .then(data => {
-      if (data && typeof data.count === 'number') {
-        countEl.textContent = data.count.toLocaleString('th-TH');
+      // รองรับทั้งรูปแบบ { value: ... } และ { count: ... }
+      const total = data.value ?? data.count;
+      if (typeof total === 'number') {
+        countEl.textContent = total.toLocaleString('th-TH');
         sessionStorage.setItem('si_hr_counted', 'true');
       } else {
         countEl.textContent = '-';
