@@ -1,13 +1,19 @@
 /* ==========================================
    Shared Navbar & Footer Styles
    ========================================== */
-.site-navbar {
+/* ล็อกตัวครอบ Navbar ให้ติดขอบบนตลอดเวลา */
+#navbar-placeholder {
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
+  background: #ffffff;
+}
+
+.site-navbar {
   background: #ffffff;
   border-bottom: 1px solid #e2ebe5;
-  box-shadow: 0 2px 10px rgba(15, 81, 50, 0.06);
+  box-shadow: 0 2px 10px rgba(15, 81, 50, 0.08);
 }
 
 .site-navbar-inner {
