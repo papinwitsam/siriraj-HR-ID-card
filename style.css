@@ -140,3 +140,89 @@
   }
 }
 
+
+/* ==========================================
+   แถบแจ้งสถานะเปิด-ปิดห้องทำบัตร & ประกาศด่วน
+   ========================================== */
+.office-status-bar {
+  max-width: 1160px;
+  margin: 18px auto 0;
+  padding: 0 20px;
+}
+
+.office-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid #d5e5dc;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 81, 50, 0.06);
+  font-size: 0.95rem;
+}
+
+.office-status-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* สถานะ: เปิดให้บริการ (สีเขียว) */
+.office-status-card.is-open {
+  background: #eef9f2;
+  border-color: #b7dfc7;
+  color: #0f5132;
+}
+.office-status-card.is-open .status-dot {
+  background: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
+}
+
+/* สถานะ: พักเที่ยง (สีส้ม) */
+.office-status-card.is-break {
+  background: #fff8eb;
+  border-color: #f3d59b;
+  color: #855808;
+}
+.office-status-card.is-break .status-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+/* สถานะ: ปิดทำการ / ประกาศพิเศษ (สีแดง) */
+.office-status-card.is-closed {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+.office-status-card.is-closed .status-dot {
+  background: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+}
+
+.office-status-schedule {
+  font-size: 0.86rem;
+  opacity: 0.88;
+}
+
+@media (max-width: 768px) {
+  .office-status-bar {
+    padding: 0 12px;
+    margin-top: 14px;
+  }
+  .office-status-card {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+}
