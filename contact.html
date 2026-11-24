@@ -233,6 +233,165 @@
       line-height: 1.55;
     }
 
+    /* ==========================================
+       ส่วนแผนที่และภาพถ่ายทางเดินไปตึกท่านผู้หญิงวิจิตรา
+       ========================================== */
+    .location-guide-section {
+      margin-top: 24px;
+      padding: 26px;
+      border: 1px solid #e3ebe5;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 6px 22px rgba(15, 81, 50, 0.07);
+    }
+
+    .location-guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .location-guide-header h2 {
+      margin: 0 0 4px;
+      color: #0f5132;
+      font-size: 1.3rem;
+    }
+
+    .location-guide-header p {
+      margin: 0;
+      color: #59665e;
+      font-size: 0.95rem;
+    }
+
+    .maps-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      background: #0f5132;
+      color: #ffffff !important;
+      font-size: 0.94rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(15, 81, 50, 0.18);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .maps-nav-btn:hover {
+      background: #0a3d25;
+      transform: translateY(-2px);
+    }
+
+    /* กรอบแผนที่ Google Maps */
+    .map-embed-wrap {
+      width: 100%;
+      height: 300px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #dce6e0;
+      background: #eef4f0;
+      margin-bottom: 22px;
+    }
+
+    .map-embed-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* กริดภาพถ่ายจุดสังเกตทางเดิน */
+    .walkway-title {
+      margin: 0 0 14px;
+      color: #26372e;
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    .walkway-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .walkway-card {
+      border: 1px solid #e5ede8;
+      border-radius: 14px;
+      background: #f8fbf9;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .walkway-photo {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #e7f1eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #557061;
+      text-align: center;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .walkway-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .walkway-step-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(15, 81, 50, 0.9);
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .walkway-caption {
+      padding: 13px 15px;
+    }
+
+    .walkway-caption strong {
+      display: block;
+      color: #0f5132;
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .walkway-caption span {
+      display: block;
+      color: #59665e;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .location-guide-section {
+        padding: 20px;
+        border-radius: 16px;
+      }
+      .map-embed-wrap {
+        height: 240px;
+      }
+      .walkway-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+    }
+
     @media (max-width: 768px) {
       .contact-page {
         width: calc(100% - 24px);
@@ -311,6 +470,92 @@
             </div>
           </div>
         </div>
+
+        <!-- ส่วนแผนที่และภาพถ่ายทางเดินไปตึกท่านผู้หญิงวิจิตรา -->
+    <section class="location-guide-section" aria-labelledby="location-guide-title">
+      <div class="location-guide-header">
+        <div>
+          <h2 id="location-guide-title">แผนที่และเส้นทางเดินไปห้องทำบัตร</h2>
+          <p>อาคารท่านผู้หญิงวิจิตรา โรงพยาบาลศิริราช (เปิดนำทางเดินเท้าผ่าน Google Maps ได้ทันที)</p>
+        </div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=ตึกท่านผู้หญิงวิจิตรา+โรงพยาบาลศิริราช&travelmode=walking"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="maps-nav-btn">
+          📍 เปิดนำทางเดินเท้า (Google Maps)
+        </a>
+      </div>
+
+      <!-- แผนที่ Google Maps แบบฝัง -->
+      <div class="map-embed-wrap">
+        <iframe
+          title="แผนที่ตึกท่านผู้หญิงวิจิตรา โรงพยาบาลศิริราช"
+          src="https://maps.google.com/maps?q=ตึกท่านผู้หญิงวิจิตรา%20โรงพยาบาลศิริราช&t=&z=17&ie=UTF8&iwloc=&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <!-- ภาพถ่ายจุดสังเกตทางเดิน 3 ขั้นตอน -->
+      <h3 class="walkway-title">จุดสังเกตทางเดินไปยังห้องทำบัตรพนักงาน</h3>
+      <div class="walkway-grid">
+
+        <!-- จุดที่ 1 -->
+        <article class="walkway-card">
+          <div class="walkway-photo">
+            <span class="walkway-step-badge">จุดที่ 1</span>
+            <!-- เมื่อถ่ายรูปแล้ว นำไฟล์ชื่อ walkway-1.jpg มาวางในโฟลเดอร์เว็บ รูปจะแสดงอัตโนมัติ -->
+            <img src="walkway-1.jpg" alt="ทางเข้าตึกท่านผู้หญิงวิจิตรา" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none;">
+              <div style="font-size:1.8rem; margin-bottom:4px;">🏥</div>
+              <small>ภาพทางเข้าอาคารท่านผู้หญิงวิจิตรา</small>
+            </div>
+          </div>
+          <div class="walkway-caption">
+            <strong>ทางเข้าตึกท่านผู้หญิงวิจิตรา</strong>
+            <span>สังเกตป้ายชื่ออาคารท่านผู้หญิงวิจิตรา บริเวณทางเข้าหลัก</span>
+          </div>
+        </article>
+
+        <!-- จุดที่ 2 -->
+        <article class="walkway-card">
+          <div class="walkway-photo">
+            <span class="walkway-step-badge">จุดที่ 2</span>
+            <!-- เมื่อถ่ายรูปแล้ว นำไฟล์ชื่อ walkway-2.jpg มาวางในโฟลเดอร์เว็บ รูปจะแสดงอัตโนมัติ -->
+            <img src="walkway-2.jpg" alt="โถงทางเดินภายในตึกท่านผู้หญิงวิจิตรา" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none;">
+              <div style="font-size:1.8rem; margin-bottom:4px;">🚶</div>
+              <small>ภาพโถงทางเดิน / จุดขึ้นชั้น</small>
+            </div>
+          </div>
+          <div class="walkway-caption">
+            <strong>โถงทางเดินภายในอาคาร</strong>
+            <span>เดินตามป้ายบอกทางไปยังจุดบริการฝ่ายทรัพยากรบุคคล</span>
+          </div>
+        </article>
+
+        <!-- จุดที่ 3 -->
+        <article class="walkway-card">
+          <div class="walkway-photo">
+            <span class="walkway-step-badge">จุดที่ 3</span>
+            <!-- เมื่อถ่ายรูปแล้ว นำไฟล์ชื่อ walkway-3.jpg มาวางในโฟลเดอร์เว็บ รูปจะแสดงอัตโนมัติ -->
+            <img src="walkway-3.jpg" alt="ป้ายหน้าห้องทำบัตรพนักงาน" loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none;">
+              <div style="font-size:1.8rem; margin-bottom:4px;">🪪</div>
+              <small>ภาพหน้าห้องทำบัตรพนักงาน</small>
+            </div>
+          </div>
+          <div class="walkway-caption">
+            <strong>หน้าห้องทำบัตรพนักงาน</strong>
+            <span>ถึงจุดให้บริการติดต่อเจ้าหน้าที่ (จันทร์, พุธ, ศุกร์ เวลา 08:30–16:30 น.)</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
 
         <div class="feedback-banner">
           <span>มีข้อเสนอแนะเพิ่มเติมสำหรับเว็บไซต์หรือการให้บริการ?</span>
