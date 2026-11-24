@@ -96,7 +96,7 @@ function renderOfficeStatus() {
   const closeTime   = 16 * 60 + 30;  // 16:30 น.
 
   let statusClass = 'is-closed';
-  let statusText = 'ขณะนี้ห้องทำบัตรปิดทำการ (เปิดให้บริการวันจันทร์, พุธ, ศุกร์)';
+  let statusText = 'ขณะนี้ห้องทำบัตรปิดทำการ';
 
   if (isServiceDay) {
     if ((totalMinutes >= openMorning && totalMinutes < lunchStart) ||
