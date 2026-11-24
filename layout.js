@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <a href="index.html" class="nav-btn">หน้าแรก</a>
           <a href="new-employee-card.html" class="nav-btn">พนักงานบรรจุใหม่</a>
           <a href="half-day-leave.html" class="nav-btn">การลงเวลา ลาครึ่งวัน</a>
+          <a href="faq.html" class="nav-btn">คำถามที่พบบ่อย</a>
           <a href="contact.html" class="nav-btn nav-btn-outline">ติดต่อเรา</a>
         </nav>
       </div>
