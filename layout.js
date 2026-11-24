@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. กำหนดโครงสร้าง Navbar <img src="favicon.png" alt="โลโก้ศิริราช" class="site-brand-logo">
+  // 1. กำหนดโครงสร้าง Navbar
   const navbarHTML = `
     <header class="site-navbar">
       <div class="site-navbar-inner">
         <a href="index.html" class="site-brand">
-
           <div class="site-brand-text">
             <strong>Si_HR ID card</strong>
             <span>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</span>
@@ -31,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <p>ตึกท่านผู้หญิงวิจิตรา | จันทร์ , พุธ , ศุกร์ | เวลา 08:30 - 16:30 น. | โทร. 02-419-7180</p>
         </div>
         <div class="footer-copy">
-        ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
+          ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
         </div>
       </div>
     </footer>
@@ -55,11 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
       link.classList.add('is-active');
     }
   });
+
+  // 5. เรียกใช้แถบสถานะเปิด-ปิดห้องทำบัตร
+  renderOfficeStatus();
 });
-
-
-// เรียกใช้ฟังก์ชันนี้เพิ่มใน document.addEventListener('DOMContentLoaded', ...)
-renderOfficeStatus();
 
 function renderOfficeStatus() {
   const placeholder = document.getElementById('office-status-placeholder');
