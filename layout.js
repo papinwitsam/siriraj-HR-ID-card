@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </header>
   `;
 
-  // 2. กำหนดโครงสร้าง Footer
+  // 2. กำหนดโครงสร้าง Footer (พร้อมกล่องตัวนับผู้เข้าชม)
   const footerHTML = `
     <footer class="site-footer">
       <div class="site-footer-inner">
@@ -30,7 +30,12 @@ document.addEventListener('DOMContentLoaded', function () {
           <p>ตึกท่านผู้หญิงวิจิตรา | จันทร์ , พุธ , ศุกร์ | เวลา 08:30 - 16:30 น. | โทร. 02-419-7180</p>
         </div>
         <div class="footer-copy">
-          ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล
+          <div>ฝ่ายทรัพยากรบุคคล คณะแพทยศาสตร์ศิริราชพยาบาล</div>
+          <div class="visitor-counter-wrap">
+            <span class="visitor-counter-box">
+              ผู้เข้าชมเว็บไซต์: <strong id="visitorCount" class="visitor-number">...</strong> ครั้ง
+            </span>
+          </div>
         </div>
       </div>
     </footer>
@@ -55,18 +60,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // 5. เรียกใช้แถบสถานะเปิด-ปิดห้องทำบัตร
+  // 5. เรียกใช้แถบสถานะเปิด-ปิดห้องทำบัตร และตัวนับผู้เข้าชม
   renderOfficeStatus();
+  updateVisitorCounter();
 });
 
+// ฟังก์ชันนับจำนวนผู้เข้าชม (Google Apps Script)
+function updateVisitorCounter() {
+  const countEl = document.getElementById('visitorCount');
+  if (!countEl) return;
+
+  // นำ URL ของ Web App จาก Google Apps Script มาวางแทนที่ข้อความในเครื่องหมายคำพูดด้านล่าง
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJF4kp8xqZWqCV-BgRxUREoFspCSusBGp680QLFaKNlHfLWWkKZOBGiksrlgBdSMGu/exec';
+
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('วาง_URL')) {
+    const wrap = document.querySelector('.visitor-counter-wrap');
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+
+  window.handleVisitorCount = function (data) {
+    if (data && typeof data.count === 'number') {
+      countEl.textContent = data.count.toLocaleString('th-TH');
+      sessionStorage.setItem('si_hr_counted', 'true');
+    } else {
+      countEl.textContent = '1';
+    }
+  };
+
+  const hasCounted = sessionStorage.getItem('si_hr_counted');
+  const script = document.createElement('script');
+  script.src = `${APPS_SCRIPT_URL}?callback=handleVisitorCount${hasCounted ? '&view=1' : ''}&_=${Date.now()}`;
+  script.onerror = function () {
+    const wrap = document.querySelector('.visitor-counter-wrap');
+    if (wrap) wrap.style.display = 'none';
+  };
+  document.body.appendChild(script);
+}
+
+// ฟังก์ชันแสดงสถานะเปิด-ปิดห้องทำบัตรแบบเรียลไทม์
 function renderOfficeStatus() {
   const placeholder = document.getElementById('office-status-placeholder');
   if (!placeholder) return;
 
-  // =========================================================
-  // ช่องใส่ประกาศด่วน (ถ้าไม่มีประกาศพิเศษ ให้ปล่อยเป็นข้อความว่าง '')
-  // ตัวอย่าง: const SPECIAL_NOTICE = 'ประกาศ: วันที่ 5 ธ.ค. ห้องทำบัตรปิดทำการเนื่องในวันหยุดนักขัตฤกษ์';
-  // =========================================================
   const SPECIAL_NOTICE = '';
 
   if (SPECIAL_NOTICE.trim() !== '') {
@@ -84,19 +120,18 @@ function renderOfficeStatus() {
     return;
   }
 
-  // ดึงวันและเวลาปัจจุบันตามเขตเวลาประเทศไทย (Asia/Bangkok)
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
-  const day = now.getDay(); // 0=อาทิตย์, 1=จันทร์, 2=อังคาร, 3=พุธ, 4=พฤหัส, 5=ศุกร์, 6=เสาร์
+  const day = now.getDay();
   const totalMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const isServiceDay = (day === 1 || day === 3 || day === 5); // จันทร์, พุธ, ศุกร์
-  const openMorning = 8 * 60 + 30;   // 08:30 น.
-  const lunchStart  = 12 * 60;       // 12:00 น.
-  const lunchEnd    = 13 * 60;       // 13:00 น.
-  const closeTime   = 16 * 60 + 30;  // 16:30 น.
+  const isServiceDay = (day === 1 || day === 3 || day === 5);
+  const openMorning = 8 * 60 + 30;
+  const lunchStart  = 12 * 60;
+  const lunchEnd    = 13 * 60;
+  const closeTime   = 16 * 60 + 30;
 
   let statusClass = 'is-closed';
-  let statusText = 'ขณะนี้ห้องทำบัตรปิดทำการ';
+  let statusText = 'ขณะนี้ห้องทำบัตรปิดทำการ (เปิดให้บริการวันจันทร์, พุธ, ศุกร์)';
 
   if (isServiceDay) {
     if ((totalMinutes >= openMorning && totalMinutes < lunchStart) ||
