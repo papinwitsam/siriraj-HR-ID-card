@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>คำถามที่พบบ่อย (FAQ) - Si_HR ID card</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- เรียกใช้ไฟล์ CSS กลาง -->
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: clip;
+      background: #f4f6f9;
+      color: #26372e;
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+    }
+    a { text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* โครงสร้างหลักหน้า FAQ */
+    .faq-page {
+      flex: 1 0 auto;
+      width: min(100% - 32px, 920px);
+      margin: 32px auto 48px;
+    }
+
+    /* ส่วนหัว Banner */
+    .faq-hero {
+      margin-bottom: 22px;
+      padding: 30px 34px;
+      border-radius: 18px;
+      color: #fff;
+      background: linear-gradient(125deg, #094824, #0f5132 55%, #19845a);
+      box-shadow: 0 8px 24px rgba(15, 81, 50, 0.12);
+    }
+
+    .faq-hero__label {
+      display: inline-block;
+      margin-bottom: 7px;
+      color: #cce9d8;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+    }
+
+    .faq-hero h1 {
+      margin: 0 0 7px;
+      font-size: clamp(1.65rem, 3.5vw, 2.15rem);
+      line-height: 1.3;
+    }
+
+    .faq-hero p {
+      margin: 0;
+      color: #e5f2e9;
+      font-size: 1.02rem;
+    }
+
+    /* ช่องค้นหาคำถาม */
+    .faq-search-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .faq-search-input {
+      width: 100%;
+      padding: 14px 44px 14px 18px;
+      border: 1px solid #d5e2da;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #26372e;
+      font-family: inherit;
+      font-size: 1rem;
+      box-shadow: 0 4px 14px rgba(15, 81, 50, 0.05);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .faq-search-input:focus {
+      outline: none;
+      border-color: #198754;
+      box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.14);
+    }
+
+    .faq-search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #647067;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    /* รายการคำถาม-คำตอบ (Accordion) */
+    .faq-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .faq-item {
+      background: #ffffff;
+      border: 1px solid #e2ebe5;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(15, 81, 50, 0.05);
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .faq-item:hover,
+    .faq-item[open] {
+      border-color: #198754;
+      box-shadow: 0 8px 22px rgba(15, 81, 50, 0.09);
+    }
+
+    .faq-question {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      cursor: pointer;
+      list-style: none;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #26372e;
+      line-height: 1.5;
+      user-select: none;
+    }
+
+    .faq-question::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-badge-q {
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #0f5132;
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .faq-question-text {
+      flex: 1;
+    }
+
+    .faq-toggle-icon {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #eef6f1;
+      color: #0f5132;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      transition: transform 0.25s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .faq-item[open] .faq-toggle-icon {
+      transform: rotate(45deg);
+      background: #0f5132;
+      color: #ffffff;
+    }
+
+    .faq-answer {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 22px 20px;
+      border-top: 1px solid #edf3ef;
+      background: #f9fcfa;
+      color: #3d4f45;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .faq-badge-a {
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #e3f2e8;
+      color: #0f5132;
+      border: 1px solid #bfe0cb;
+      font-size: 0.92rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      margin-top: 2px;
+    }
+
+    .faq-answer-text p {
+      margin: 0;
+    }
+
+    .faq-answer-text p + p {
+      margin-top: 8px;
+    }
+
+    /* กล่องแจ้งเตือนเมื่อค้นหาไม่พบ */
+    .faq-empty {
+      display: none;
+      text-align: center;
+      padding: 32px 20px;
+      background: #ffffff;
+      border: 1px dashed #cbd8d0;
+      border-radius: 16px;
+      color: #647067;
+    }
+
+    /* กล่องติดต่อเพิ่มเติมด้านล่าง */
+    .faq-contact-cta {
+      margin-top: 28px;
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: #eaf5ee;
+      border: 1px solid #cde4d5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .faq-contact-cta p {
+      margin: 0;
+      color: #155737;
+      font-weight: 600;
+    }
+
+    .faq-contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      background: #0f5132;
+      color: #ffffff !important;
+      font-size: 0.94rem;
+      font-weight: 600;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .faq-contact-btn:hover {
+      background: #0a3d25;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .faq-page {
+        width: calc(100% - 24px);
+        margin: 20px auto 36px;
+      }
+      .faq-hero {
+        padding: 24px 20px;
+        border-radius: 16px;
+      }
+      .faq-question {
+        padding: 16px;
+        font-size: 1.02rem;
+        gap: 11px;
+      }
+      .faq-answer {
+        padding: 14px 16px 18px;
+        gap: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- จุดวาง Navbar อัตโนมัติ -->
+  <div id="navbar-placeholder"></div>
+
+  <main class="faq-page">
+    <header class="faq-hero">
+      <span class="faq-hero__label">FREQUENTLY ASKED QUESTIONS</span>
+      <h1>คำถามที่พบบ่อย</h1>
+      <p>รวมข้อสงสัยและคำแนะนำเกี่ยวกับการทำบัตรพนักงาน การแก้ไขข้อมูล และเอกสารที่ต้องใช้</p>
+    </header>
+
+    <!-- ช่องค้นหาคำถาม -->
+    <div class="faq-search-box">
+      <input type="text" id="faqSearch" class="faq-search-input" placeholder="พิมพ์คำค้นหา เช่น บัตรหมดอายุ, เปลี่ยนชื่อ, เปลี่ยนตำแหน่ง..." aria-label="ค้นหาคำถามที่พบบ่อย">
+      <span class="faq-search-icon" aria-hidden="true">🔍</span>
+    </div>
+
+    <!-- รายการคำถาม-คำตอบ -->
+    <div class="faq-list" id="faqList">
+
+      <!-- ข้อที่ 1 -->
+      <details class="faq-item" open>
+        <summary class="faq-question">
+          <span class="faq-badge-q">ถาม</span>
+          <span class="faq-question-text">บัตรหมดอายุ สามารถทำบัตรแทนกันได้ไหม</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-answer">
+          <span class="faq-badge-a">ตอบ</span>
+          <div class="faq-answer-text">
+            <p>ได้ ให้นำ<strong>บัตรเดิมที่หมดอายุ</strong>มาติดต่อทำบัตรใหม่ที่ห้องทำบัตรพนักงาน (ตึกท่านผู้หญิงวิจิตรา)</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ข้อที่ 2 -->
+      <details class="faq-item" open>
+        <summary class="faq-question">
+          <span class="faq-badge-q">ถาม</span>
+          <span class="faq-question-text">กรณีเปลี่ยนชื่อ จะขอเปลี่ยนข้อมูลหน้าบัตรพนักงานต้องใช้เอกสารอะไรบ้าง</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-answer">
+          <span class="faq-badge-a">ตอบ</span>
+          <div class="faq-answer-text">
+            <p>แสดง<strong>บัตรประชาชนที่เปลี่ยนชื่อแล้ว</strong> หรือ<strong>เอกสารสำคัญการเปลี่ยนชื่อ</strong> (ใบ ช.3) ต่อเจ้าหน้าที่ที่ห้องทำบัตร</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ข้อที่ 3 -->
+      <details class="faq-item" open>
+        <summary class="faq-question">
+          <span class="faq-badge-q">ถาม</span>
+          <span class="faq-question-text">กรณีเปลี่ยนตำแหน่งใช้เอกสารอะไรบ้าง</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-answer">
+          <span class="faq-badge-a">ตอบ</span>
+          <div class="faq-answer-text">
+            <p>ใช้<strong>เอกสารคำสั่งแต่งตั้ง/เปลี่ยนตำแหน่ง</strong> หรือแสดงข้อมูลการเปลี่ยนตำแหน่งในระบบ <strong>Si vWork</strong></p>
+          </div>
+        </div>
+      </details>
+
+      <!-- =========================================================
+           วิธีเพิ่มคำถามใหม่ในอนาคต:
+           ก๊อปปี้ตั้งแต่ <details class="faq-item"> จนถึง </details> ด้านล่างนี้ไปวางต่อได้เลย
+           ========================================================= -->
+      <!--
+      <details class="faq-item">
+        <summary class="faq-question">
+          <span class="faq-badge-q">ถาม</span>
+          <span class="faq-question-text">พิมพ์คำถามใหม่ตรงนี้</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-answer">
+          <span class="faq-badge-a">ตอบ</span>
+          <div class="faq-answer-text">
+            <p>พิมพ์คำตอบตรงนี้</p>
+          </div>
+        </div>
+      </details>
+      -->
+
+    </div>
+
+    <!-- ข้อความเมื่อค้นหาไม่พบ -->
+    <div class="faq-empty" id="faqEmpty">
+      ไม่พบคำถามที่ตรงกับคำค้นหา ลองใช้คำค้นหาอื่นหรือติดต่อสอบถามเจ้าหน้าที่โดยตรงครับ
+    </div>
+
+    <!-- กล่องติดต่อเพิ่มเติม -->
+    <div class="faq-contact-cta">
+      <p>หากยังไม่พบคำตอบที่ต้องการ สามารถสอบถามเจ้าหน้าที่ห้องทำบัตรได้โดยตรง</p>
+      <a href="contact.html" class="faq-contact-btn">ติดต่อห้องทำบัตร &rarr;</a>
+    </div>
+  </main>
+
+  <!-- จุดวาง Footer อัตโนมัติ -->
+  <div id="footer-placeholder"></div>
+
+  <!-- เรียกใช้สคริปต์โหลด Navbar & Footer -->
+  <script src="layout.js"></script>
+
+  <!-- สคริปต์ค้นหาคำถามแบบเรียลไทม์ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('faqSearch');
+      const faqItems = document.querySelectorAll('.faq-item');
+      const emptyBox = document.getElementById('faqEmpty');
+
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', function () {
+        const keyword = this.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        faqItems.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          const isMatch = !keyword || text.includes(keyword);
+          item.style.display = isMatch ? '' : 'none';
+          if (isMatch) {
+            visibleCount++;
+            if (keyword) item.open = true; // กางคำตอบให้อัตโนมัติเมื่อค้นหาเจอ
+          }
+        });
+
+        emptyBox.style.display = visibleCount === 0 ? 'block' : 'none';
+      });
+    });
+  </script>
+
+</body>
+</html>
