@@ -153,6 +153,33 @@
       text-decoration: underline;
     }
 
+    /* ปุ่มคัดลอกเบอร์โทร */
+    .phone-row-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .copy-mini-btn {
+      padding: 4px 10px;
+      border: 1px solid #bfd8ca;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0f5132;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .copy-mini-btn:hover {
+      background: #e7f3eb;
+      border-color: #0f5132;
+    }
+
     .feedback-banner {
       margin-top: 16px;
       padding-top: 16px;
@@ -240,7 +267,55 @@
       line-height: 1.55;
     }
 
-    /* ส่วนแผนที่และภาพถ่ายทางเดินไปตึกท่านผู้หญิงวิจิตรา */
+    /* ปุ่มแชร์ / คัดลอกลิงก์ใต้ QR Code */
+    .share-card-actions {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .share-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .share-btn--line {
+      border: none;
+      background: #06c755;
+      color: #ffffff !important;
+    }
+
+    .share-btn--line:hover {
+      background: #05b04b;
+    }
+
+    .share-btn--copy {
+      border: 1px solid #cbd8d0;
+      background: #f8fbf9;
+      color: #26372e;
+    }
+
+    .share-btn--copy:hover {
+      background: #eef5f1;
+      border-color: #0f5132;
+    }
+
+    /* ส่วนแผนที่และทางเดินไปตึกท่านผู้หญิงวิจิตรา */
     .location-guide-section {
       margin-top: 24px;
       padding: 26px;
@@ -297,7 +372,7 @@
       overflow: hidden;
       border: 1px solid #dce6e0;
       background: #eef4f0;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .map-embed-wrap iframe {
@@ -308,77 +383,34 @@
     }
 
     .walkway-title {
-      margin: 0 0 14px;
+      margin: 0;
       color: #26372e;
       font-size: 1.08rem;
       font-weight: 700;
     }
 
-    .walkway-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .walkway-card {
-      border: 1px solid #e5ede8;
-      border-radius: 14px;
-      background: #f8fbf9;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .walkway-photo {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: #e7f1eb;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #557061;
-      text-align: center;
-      padding: 12px;
-      overflow: hidden;
-    }
-
-    .walkway-photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .walkway-step-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 3px 10px;
+    /* กล่องแจ้งเตือนมุมล่างเมื่อกดคัดลอก */
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 10px 20px;
       border-radius: 999px;
-      background: rgba(15, 81, 50, 0.9);
+      background: #0f5132;
       color: #ffffff;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.92rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(15, 81, 50, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
     }
 
-    .walkway-caption {
-      padding: 13px 15px;
-    }
-
-    .walkway-caption strong {
-      display: block;
-      color: #0f5132;
-      font-size: 0.98rem;
-      margin-bottom: 4px;
-    }
-
-    .walkway-caption span {
-      display: block;
-      color: #59665e;
-      font-size: 0.88rem;
-      line-height: 1.5;
+    .copy-toast.is-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     @media (max-width: 768px) {
@@ -409,10 +441,6 @@
       }
       .map-embed-wrap {
         height: 240px;
-      }
-      .walkway-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
       }
     }
   </style>
@@ -445,7 +473,10 @@
             <span class="contact-item__icon" aria-hidden="true">☎</span>
             <div>
               <span class="contact-item__label">โทรศัพท์</span>
-              <a class="contact-item__value" href="tel:024197180">0-2419-7180</a>
+              <div class="phone-row-wrap">
+                <a class="contact-item__value" href="tel:024197180">0-2419-7180</a>
+                <button type="button" class="copy-mini-btn" onclick="copyText('024197180', 'คัดลอกเบอร์โทร 0-2419-7180 แล้ว')">คัดลอก</button>
+              </div>
             </div>
           </div>
 
@@ -490,10 +521,19 @@
           <img src="https://lh3.googleusercontent.com/d/1Mvo_v_kDtL4wOh22Q36dZmUaND2Kub74" alt="QR Code สำหรับเพิ่มเพื่อน LINE OA Si_HR ID card" loading="lazy">
         </a>
         <p class="line-card__hint">สแกน QR Code เพื่อเพิ่มเพื่อนและติดต่อห้องทำบัตรผ่าน LINE</p>
+
+        <div class="share-card-actions">
+          <button type="button" class="share-btn share-btn--line" onclick="sharePage()">
+            ส่งต่อให้เพื่อน
+          </button>
+          <button type="button" class="share-btn share-btn--copy" onclick="copyPageLink()">
+            คัดลอกลิงก์
+          </button>
+        </div>
       </aside>
     </div>
 
-    <!-- ส่วนแผนที่และภาพถ่ายทางเดินไปตึกท่านผู้หญิงวิจิตรา -->
+    <!-- ส่วนแผนที่และทางเดินไปตึกท่านผู้หญิงวิจิตรา -->
     <section class="location-guide-section" aria-labelledby="location-guide-title">
       <div class="location-guide-header">
         <div>
@@ -518,15 +558,70 @@
       </div>
 
       <h3 class="walkway-title">เข้าประตูหน้า ตึกท่านผู้หญิงวิจิตรา</h3>
-      
     </section>
   </main>
 
   <!-- จุดวาง Footer อัตโนมัติ -->
   <div id="footer-placeholder"></div>
 
+  <!-- แจ้งเตือนเมื่อคัดลอกสำเร็จ -->
+  <div id="copyToast" class="copy-toast" role="status" aria-live="polite"></div>
+
   <!-- เรียกใช้สคริปต์โหลด Navbar & Footer -->
   <script src="layout.js"></script>
+
+  <script>
+    function showCopyToast(message) {
+      const toast = document.getElementById('copyToast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add('is-show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.remove('is-show');
+      }, 2400);
+    }
+
+    function copyText(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showCopyToast(successMsg);
+        }).catch(() => fallbackCopy(text, successMsg));
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const input = document.createElement('textarea');
+      input.value = text;
+      input.style.position = 'fixed';
+      input.style.opacity = '0';
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      showCopyToast(successMsg);
+    }
+
+    function copyPageLink() {
+      copyText(window.location.href, 'คัดลอกลิงก์หน้าติดต่อห้องทำบัตรแล้ว');
+    }
+
+    function sharePage() {
+      const shareData = {
+        title: 'ติดต่อห้องทำบัตรพนักงาน - Si_HR ID card',
+        text: 'ช่องทางติดต่อและแผนที่เดินไปห้องทำบัตรพนักงาน (ตึกท่านผู้หญิงวิจิตรา ศิริราช)',
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        copyText(`${shareData.text}\n${shareData.url}`, 'คัดลอกข้อความและลิงก์สำหรับส่งต่อแล้ว');
+      }
+    }
+  </script>
 
 </body>
 </html>
